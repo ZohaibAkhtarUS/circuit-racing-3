@@ -59,6 +59,8 @@ const cameraNames = ['Chase Cam', 'Cockpit', 'Overhead', 'Orbit'];
 let orbitAngle = 0;
 let raceStartTime = 0;
 let keys = {};
+let mobileInput = { up: false, down: false, left: false, right: false, drift: false, nitro: false, useItem: false };
+let isMobile = false;
 let trackWalls = [];
 let tutorialActive = false, tutorialStep = 0;
 let minimapCtx = null;
@@ -1423,13 +1425,14 @@ function formatTime(ms) { const s = ms / 1000; return `${Math.floor(s / 60).toSt
 // --- INPUT ---
 function getP1Input() {
     if (gameMode === 'vs_bots') {
-        return { up: keys['ArrowUp'] || keys['KeyW'], down: keys['ArrowDown'] || keys['KeyS'],
-            left: keys['ArrowLeft'] || keys['KeyA'], right: keys['ArrowRight'] || keys['KeyD'],
-            drift: keys['ShiftLeft'] || keys['ShiftRight'] || keys['Space'],
-            nitro: keys['KeyE'], useItem: keys['KeyF'] };
+        return { up: keys['ArrowUp'] || keys['KeyW'] || mobileInput.up, down: keys['ArrowDown'] || keys['KeyS'] || mobileInput.down,
+            left: keys['ArrowLeft'] || keys['KeyA'] || mobileInput.left, right: keys['ArrowRight'] || keys['KeyD'] || mobileInput.right,
+            drift: keys['ShiftLeft'] || keys['ShiftRight'] || keys['Space'] || mobileInput.drift,
+            nitro: keys['KeyE'] || mobileInput.nitro, useItem: keys['KeyF'] || mobileInput.useItem };
     }
-    return { up: keys['KeyW'], down: keys['KeyS'], left: keys['KeyA'], right: keys['KeyD'],
-        drift: keys['Space'], nitro: keys['KeyE'], useItem: keys['KeyF'] };
+    return { up: keys['KeyW'] || mobileInput.up, down: keys['KeyS'] || mobileInput.down,
+        left: keys['KeyA'] || mobileInput.left, right: keys['KeyD'] || mobileInput.right,
+        drift: keys['Space'] || mobileInput.drift, nitro: keys['KeyE'] || mobileInput.nitro, useItem: keys['KeyF'] || mobileInput.useItem };
 }
 function getP2Input() {
     return { up: keys['ArrowUp'], down: keys['ArrowDown'], left: keys['ArrowLeft'], right: keys['ArrowRight'],
@@ -1468,6 +1471,131 @@ function showTutorialStep() {
 function nextTutorialStep() { tutorialStep++; if (tutorialStep >= TUTORIAL_STEPS.length) endTutorial(); else showTutorialStep(); }
 function skipTutorial() { endTutorial(); }
 function endTutorial() { tutorialActive = false; document.getElementById('tutorial-overlay').style.display = 'none'; document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight')); gameState = 'countdown'; runCountdown(); }
+
+// --- MOBILE CONTROLS ---
+function setupMobileControls() {
+    isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isMobile) return;
+
+    document.body.classList.add('is-mobile');
+
+    const joystickZone = document.getElementById('joystick-zone');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickThumb = document.getElementById('joystick-thumb');
+    const baseRadius = 65; // half of 130px base
+    const maxDist = baseRadius - 10;
+    let joystickTouchId = null;
+
+    function updateJoystick(touchX, touchY) {
+        const rect = joystickBase.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        let dx = touchX - centerX;
+        let dy = touchY - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Clamp to base circle
+        if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+        }
+
+        // Move thumb visually
+        joystickThumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+        // Normalize to -1..1
+        const nx = dx / maxDist;
+        const ny = dy / maxDist;
+
+        // Map to input with dead zone
+        mobileInput.left = nx < -0.3;
+        mobileInput.right = nx > 0.3;
+        mobileInput.up = ny < -0.3;
+        mobileInput.down = ny > 0.3;
+    }
+
+    function resetJoystick() {
+        joystickThumb.style.transform = 'translate(-50%, -50%)';
+        mobileInput.left = false;
+        mobileInput.right = false;
+        mobileInput.up = false;
+        mobileInput.down = false;
+        joystickTouchId = null;
+    }
+
+    joystickZone.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        joystickTouchId = touch.identifier;
+        updateJoystick(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    joystickZone.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === joystickTouchId) {
+                updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                break;
+            }
+        }
+    }, { passive: false });
+
+    joystickZone.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === joystickTouchId) {
+                resetJoystick();
+                break;
+            }
+        }
+    }, { passive: false });
+
+    joystickZone.addEventListener('touchcancel', function(e) {
+        e.preventDefault();
+        resetJoystick();
+    }, { passive: false });
+
+    // --- Action buttons ---
+    function setupButton(id, inputKey, isToggle) {
+        const btn = document.getElementById(id);
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            btn.classList.add('pressed');
+            if (isToggle) {
+                mobileInput[inputKey] = true;
+                setTimeout(() => { mobileInput[inputKey] = false; }, 100);
+            } else {
+                mobileInput[inputKey] = true;
+            }
+        }, { passive: false });
+        btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            btn.classList.remove('pressed');
+            if (!isToggle) {
+                mobileInput[inputKey] = false;
+            }
+        }, { passive: false });
+        btn.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            btn.classList.remove('pressed');
+            if (!isToggle) {
+                mobileInput[inputKey] = false;
+            }
+        }, { passive: false });
+    }
+
+    setupButton('btn-drift', 'drift', false);
+    setupButton('btn-nitro', 'nitro', true);
+    setupButton('btn-item', 'useItem', true);
+
+    // Camera switch on tap
+    const camInfo = document.getElementById('camera-info');
+    camInfo.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        cameraMode = (cameraMode + 1) % cameraNames.length;
+        camInfo.innerHTML = cameraNames[cameraMode];
+    }, { passive: false });
+}
 
 // --- INIT ---
 function init() {
@@ -1518,6 +1646,7 @@ function init() {
     window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
     animate();
+    setupMobileControls();
 }
 
 // --- GAME LOOP ---

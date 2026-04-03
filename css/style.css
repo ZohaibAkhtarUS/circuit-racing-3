@@ -695,3 +695,238 @@ canvas {
     0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
     50% { box-shadow: 0 0 15px 4px rgba(255, 107, 53, 0.6); }
 }
+
+/* ========== MOBILE TOUCH CONTROLS ========== */
+
+#mobile-controls {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 15;
+}
+
+body.is-mobile #mobile-controls {
+    display: block;
+}
+
+/* Joystick */
+#joystick-zone {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 160px;
+    height: 160px;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+#joystick-base {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#joystick-thumb {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(255, 107, 53, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: background 0.1s;
+}
+
+/* Action buttons */
+#mobile-buttons {
+    position: absolute;
+    bottom: 24px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.mobile-action-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: opacity 0.1s, transform 0.1s;
+}
+
+#btn-drift {
+    background: rgba(255, 107, 53, 0.55);
+    font-size: 13px;
+}
+
+#btn-nitro {
+    background: rgba(0, 170, 255, 0.55);
+    font-size: 26px;
+}
+
+#btn-item {
+    background: rgba(255, 200, 0, 0.55);
+    font-size: 26px;
+}
+
+.mobile-action-btn:active,
+.mobile-action-btn.pressed {
+    opacity: 1;
+    transform: scale(0.9);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* === Mobile HUD adjustments === */
+
+body.is-mobile .controls-help,
+body.is-mobile #hud kbd {
+    display: none !important;
+}
+
+body.is-mobile #item-use-hint {
+    display: none !important;
+}
+
+body.is-mobile #minimap {
+    width: 100px;
+    height: 100px;
+    margin-top: 30px;
+}
+
+body.is-mobile #minimap canvas {
+    width: 100px;
+    height: 100px;
+}
+
+body.is-mobile #position-panel {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+}
+
+body.is-mobile #position-value {
+    font-size: 28px;
+}
+
+body.is-mobile #position-suffix {
+    font-size: 12px;
+}
+
+body.is-mobile #speed-panel {
+    bottom: auto;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+}
+
+body.is-mobile #speed-value {
+    font-size: 30px;
+}
+
+body.is-mobile #speed-bar-container {
+    width: 100px;
+}
+
+body.is-mobile #nitro-panel {
+    bottom: auto;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+}
+
+body.is-mobile #nitro-bar-container {
+    width: 90px;
+}
+
+body.is-mobile #lap-panel {
+    bottom: auto;
+    top: 10px;
+    left: auto;
+    right: 10px;
+    padding: 6px 12px;
+    margin-right: 0;
+}
+
+body.is-mobile #lap-text {
+    font-size: 13px;
+}
+
+body.is-mobile #lap-time {
+    font-size: 11px;
+}
+
+body.is-mobile #item-panel {
+    bottom: auto;
+    top: 90px;
+    right: 10px;
+    padding: 6px 12px;
+    min-width: 50px;
+}
+
+body.is-mobile #item-icon {
+    font-size: 22px;
+}
+
+body.is-mobile #camera-info {
+    top: auto;
+    bottom: 200px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 11px;
+}
+
+body.is-mobile #countdown {
+    font-size: 70px;
+}
+
+body.is-mobile #menu-overlay h1 {
+    font-size: 36px;
+}
+
+body.is-mobile #menu-overlay .subtitle {
+    font-size: 11px;
+    letter-spacing: 4px;
+}
+
+body.is-mobile .mode-btn {
+    width: 260px;
+    padding: 10px 14px;
+}
+
+body.is-mobile .mode-btn .mode-name {
+    font-size: 15px;
+}
+
+body.is-mobile #start-btn {
+    padding: 10px 36px;
+    font-size: 18px;
+}
