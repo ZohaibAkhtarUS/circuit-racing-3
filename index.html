@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Circuit Racing 3</title>
+    <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Menu -->
+        <div id="menu-overlay">
+            <h1>CIRCUIT RACING 3</h1>
+            <div class="subtitle">MIKHAIL'S RACING GAME</div>
+
+            <div class="menu-section-title">SELECT MODE</div>
+            <div class="mode-btn selected" data-mode="vs_bots" onclick="selectMode(this)">
+                <div class="mode-name">VS BOTS</div>
+                <div class="mode-desc">Race against 3 AI opponents</div>
+            </div>
+            <div class="mode-btn" data-mode="race_together" onclick="selectMode(this)">
+                <div class="mode-name">RACE TOGETHER</div>
+                <div class="mode-desc">2 players + 2 AI on same screen</div>
+            </div>
+            <div class="mode-btn" data-mode="vs_friends" onclick="selectMode(this)">
+                <div class="mode-name">VS FRIENDS</div>
+                <div class="mode-desc">2-player split screen + 2 AI</div>
+            </div>
+
+            <div class="menu-section-title">SELECT TRACK</div>
+            <div class="track-selection">
+                <div class="track-option selected" data-track="0" onclick="selectTrackOption(this)">Green Valley</div>
+                <div class="track-option" data-track="1" onclick="selectTrackOption(this)">Desert Circuit</div>
+                <div class="track-option" data-track="2" onclick="selectTrackOption(this)">Mountain Pass</div>
+            </div>
+
+            <div class="menu-section-title">CHOOSE YOUR CAR</div>
+            <div class="car-selection">
+                <div class="car-option selected" data-color="dragon" onclick="selectCar(this)"><div class="car-preview" style="background:#e74c3c"></div><div class="car-name">Fire Dragon</div></div>
+                <div class="car-option" data-color="thunder" onclick="selectCar(this)"><div class="car-preview" style="background:#3498db"></div><div class="car-name">Thunder Bolt</div></div>
+                <div class="car-option" data-color="hulk" onclick="selectCar(this)"><div class="car-preview" style="background:#2ecc71"></div><div class="car-name">Hulk Smasher</div></div>
+                <div class="car-option" data-color="goldking" onclick="selectCar(this)"><div class="car-preview" style="background:#f1c40f"></div><div class="car-name">Gold King</div></div>
+                <div class="car-option" data-color="shadow" onclick="selectCar(this)"><div class="car-preview" style="background:#2c3e50"></div><div class="car-name">Shadow Ninja</div></div>
+            </div>
+            <div class="car-selection">
+                <div class="car-option" data-color="rocket" onclick="selectCar(this)"><div class="car-preview" style="background:#ff6b35"></div><div class="car-name">Rocket Blaster</div></div>
+                <div class="car-option" data-color="galaxy" onclick="selectCar(this)"><div class="car-preview" style="background:#9b59b6"></div><div class="car-name">Galaxy Rider</div></div>
+                <div class="car-option" data-color="ice" onclick="selectCar(this)"><div class="car-preview" style="background:#00d2ff"></div><div class="car-name">Ice Breaker</div></div>
+                <div class="car-option" data-color="tiger" onclick="selectCar(this)"><div class="car-preview" style="background:#ff8c00"></div><div class="car-name">Tiger Claw</div></div>
+                <div class="car-option" data-color="pink" onclick="selectCar(this)"><div class="car-preview" style="background:#ff69b4"></div><div class="car-name">Pink Panther</div></div>
+            </div>
+
+            <button id="start-btn" onclick="startRace()">START RACE</button>
+            <button id="tutorial-btn" onclick="startRaceWithTutorial()" style="margin-top:8px;padding:8px 30px;font-size:13px;font-family:Arial,sans-serif;color:#aaa;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;">How to Play</button>
+            <div class="controls-help" id="controls-help">WASD/Arrows: Drive | Space/Shift: Drift | E: Nitro | F: Use Item | C: Camera</div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div id="position-panel">
+                <span id="position-value">1</span>
+                <span id="position-suffix">ST</span>
+            </div>
+            <div id="position-change"></div>
+            <div id="speed-panel">
+                <span id="speed-value">0</span>
+                <span id="speed-unit">KPH</span>
+                <div id="speed-bar-container"><div id="speed-bar"></div></div>
+            </div>
+            <div id="nitro-panel">
+                <div id="nitro-label">NITRO <kbd>E</kbd></div>
+                <div id="nitro-bar-container"><div id="nitro-bar"></div></div>
+            </div>
+            <div id="lap-panel">
+                <div id="lap-text">LAP 1/3</div>
+                <div id="lap-time">00:00.0</div>
+            </div>
+            <div id="item-panel">
+                <div id="item-icon">-</div>
+                <div id="item-name"></div>
+                <div id="item-use-hint"><kbd>F</kbd></div>
+            </div>
+            <div id="camera-info"><kbd>C</kbd> Chase Cam</div>
+            <div id="minimap"><canvas id="minimap-canvas" width="160" height="160"></canvas></div>
+            <div id="countdown"></div>
+        </div>
+
+        <!-- Tutorial -->
+        <div id="tutorial-overlay">
+            <div id="tutorial-box">
+                <div id="tutorial-step-indicator"></div>
+                <div id="tutorial-title"></div>
+                <div id="tutorial-text"></div>
+                <div id="tutorial-keys"></div>
+                <div id="tutorial-buttons">
+                    <button id="tutorial-skip" onclick="skipTutorial()">Skip Tutorial</button>
+                    <button id="tutorial-next" onclick="nextTutorialStep()">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="result-overlay">
+            <h1 id="result-title">RACE COMPLETE</h1>
+            <div class="result-table" id="result-table"></div>
+            <div class="result-buttons">
+                <button class="result-btn" style="background:#ff6b35" onclick="restartRace()">RACE AGAIN</button>
+                <button class="result-btn" style="background:#555" onclick="backToMenu()">MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/game3d.js?v=4"></script>
+</body>
+</html>
