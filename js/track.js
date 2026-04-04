@@ -282,7 +282,7 @@ function buildTrack() {
     banner.rotation.y = Math.atan2(sDir.x, sDir.z);
     scene.add(banner);
 
-    // Ramps — 5 spread around the track
+    // Ramps — 5 big wedge-shaped launch ramps spread around the track
     const ramps = [];
     const rampIndices = [0.12, 0.3, 0.5, 0.7, 0.88].map(f => Math.floor(f * wp.length));
     const rampColors = [0xffaa33, 0x33aaff, 0xff33aa, 0x33ffaa, 0xffff33];
@@ -290,45 +290,115 @@ function buildTrack() {
         const rp = wp[ri], rn = wp[(ri + 1) % wp.length];
         const rd = new THREE.Vector3().subVectors(rn, rp).normalize();
         const angle = Math.atan2(rd.x, rd.z);
-        // Wedge-shaped ramp (tilted so cars actually launch)
-        const rampGeo = new THREE.BoxGeometry(roadW * 0.45, 1.2, 8);
-        const rampMat = new THREE.MeshStandardMaterial({ color: rampColors[idx], roughness: 0.3, metalness: 0.4 });
-        const ramp = new THREE.Mesh(rampGeo, rampMat);
-        ramp.position.set(rp.x, rp.y + 0.6, rp.z);
-        ramp.rotation.y = angle;
-        ramp.castShadow = currentGfx.shadows;
-        scene.add(ramp);
-        // Chevron arrows on ramp
+        const rNorm = new THREE.Vector3(-rd.z, 0, rd.x);
+        const rampW = roadW * 0.55;
+        const rampLen = 12;
+        const rampH = 2.5;
+
+        // Build wedge shape using custom geometry (triangular prism)
+        const wedgeShape = new THREE.Shape();
+        wedgeShape.moveTo(0, 0);
+        wedgeShape.lineTo(rampLen, 0);
+        wedgeShape.lineTo(rampLen, rampH);
+        wedgeShape.lineTo(0, 0);
+        const wedgeGeo = new THREE.ExtrudeGeometry(wedgeShape, {
+            depth: rampW, bevelEnabled: false
+        });
+        wedgeGeo.center();
+        const rampMat = new THREE.MeshStandardMaterial({
+            color: rampColors[idx], roughness: 0.25, metalness: 0.5,
+            emissive: rampColors[idx], emissiveIntensity: 0.15
+        });
+        const rampMesh = new THREE.Mesh(wedgeGeo, rampMat);
+        rampMesh.position.set(rp.x, rp.y, rp.z);
+        rampMesh.rotation.y = angle;
+        rampMesh.castShadow = currentGfx.shadows;
+        rampMesh.receiveShadow = true;
+        scene.add(rampMesh);
+
+        // Racing stripes on ramp surface
+        for (let s = 0; s < 4; s++) {
+            const stripeFrac = (s + 0.5) / 4;
+            const stripeX = rp.x + rd.x * (stripeFrac - 0.5) * rampLen;
+            const stripeZ = rp.z + rd.z * (stripeFrac - 0.5) * rampLen;
+            const stripeY = rp.y + stripeFrac * rampH * 0.7;
+            const stripe = new THREE.Mesh(
+                new THREE.PlaneGeometry(rampW * 0.8, 0.6),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
+            );
+            stripe.position.set(stripeX, stripeY + 0.15, stripeZ);
+            stripe.rotation.x = -Math.PI / 2 + 0.2;
+            stripe.rotation.z = -angle + Math.PI / 2;
+            scene.add(stripe);
+        }
+
+        // Big chevron arrows floating above ramp
         for (let a = 0; a < 3; a++) {
             const arrow = new THREE.Mesh(
-                new THREE.ConeGeometry(0.8, 1.5, 3),
-                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 + a * 0.15 })
+                new THREE.ConeGeometry(1.2, 2, 3),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 + a * 0.2 })
             );
-            const offset = (a - 1) * 2.5;
+            const offset = (a - 1) * 3;
             arrow.position.set(
                 rp.x + rd.x * offset,
-                rp.y + 1.5,
+                rp.y + rampH + 1.5 + a * 0.3,
                 rp.z + rd.z * offset
             );
             arrow.rotation.x = -Math.PI / 2;
             arrow.rotation.z = -angle;
             scene.add(arrow);
         }
-        // Side glow poles
-        const rNorm = new THREE.Vector3(-rd.z, 0, rd.x);
+
+        // Tall side poles with glowing tips
         for (const side of [-1, 1]) {
+            // Main pole
             const pole = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.15, 0.15, 3, 6),
-                new THREE.MeshBasicMaterial({ color: rampColors[idx] })
+                new THREE.CylinderGeometry(0.2, 0.2, 5, 6),
+                new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.6, roughness: 0.3 })
             );
             pole.position.set(
-                rp.x + rNorm.x * side * (roadW * 0.25),
-                rp.y + 1.5,
-                rp.z + rNorm.z * side * (roadW * 0.25)
+                rp.x + rNorm.x * side * (rampW * 0.55),
+                rp.y + 2.5,
+                rp.z + rNorm.z * side * (rampW * 0.55)
             );
             scene.add(pole);
+            // Glowing top
+            const glow = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5, 8, 6),
+                new THREE.MeshBasicMaterial({ color: rampColors[idx] })
+            );
+            glow.position.set(
+                rp.x + rNorm.x * side * (rampW * 0.55),
+                rp.y + 5.2,
+                rp.z + rNorm.z * side * (rampW * 0.55)
+            );
+            scene.add(glow);
+            // Glow light
+            const glowLight = new THREE.PointLight(rampColors[idx], 0.4, 15);
+            glowLight.position.copy(glow.position);
+            scene.add(glowLight);
         }
-        ramps.push({ pos: rp.clone(), radius: 9 });
+
+        // "JUMP!" sign above ramp
+        const signCanvas = document.createElement('canvas');
+        signCanvas.width = 256; signCanvas.height = 64;
+        const sctx = signCanvas.getContext('2d');
+        sctx.fillStyle = '#000000';
+        sctx.fillRect(0, 0, 256, 64);
+        sctx.fillStyle = '#ffcc00';
+        sctx.font = 'bold 40px Arial';
+        sctx.textAlign = 'center';
+        sctx.fillText('JUMP!', 128, 46);
+        const signTex = new THREE.CanvasTexture(signCanvas);
+        const sign = new THREE.Mesh(
+            new THREE.PlaneGeometry(5, 1.3),
+            new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide })
+        );
+        sign.position.set(rp.x, rp.y + 6.5, rp.z);
+        sign.rotation.y = angle;
+        scene.add(sign);
+
+        ramps.push({ pos: rp.clone(), radius: 10 });
     });
 
     // Static obstacles — cones, barrels, and barriers placed on track

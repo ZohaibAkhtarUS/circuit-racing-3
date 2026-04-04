@@ -575,10 +575,16 @@ class GameCar {
         if (track && track.ramps && !this.isAirborne) {
             for (const ramp of track.ramps) {
                 const dx = this.x - ramp.pos.x, dz = this.z - ramp.pos.z;
-                if (dx * dx + dz * dz < ramp.radius * ramp.radius && this.speed > 30) {
-                    this.vy = 10;
+                if (dx * dx + dz * dz < ramp.radius * ramp.radius && this.speed > 20) {
+                    // Launch force scales with speed
+                    const launchPower = Math.min(18, 8 + this.speed * 0.06);
+                    this.vy = launchPower;
                     this.isAirborne = true;
                     this.airTime = 0;
+                    // Big boost particles on launch
+                    for (let i = 0; i < 10; i++) emitParticle(this.x, trackY + 0.5, this.z, 'boost');
+                    for (let i = 0; i < 5; i++) emitParticle(this.x, trackY + 0.5, this.z, 'spark');
+                    playBoostActivate();
                 }
             }
         }
@@ -587,11 +593,16 @@ class GameCar {
             this.airTime += dt;
             this.vy -= PHYS.gravity * dt;
             const airY = trackY + this.vy * this.airTime;
-            if (airY <= trackY && this.airTime > 0.1) {
+            // Nose-up tilt while airborne
+            this.bodyPitch = Math.max(-0.2, Math.min(0.15, -this.vy * 0.015));
+            if (airY <= trackY && this.airTime > 0.15) {
                 this.isAirborne = false;
                 this.vy = 0;
                 this.airTime = 0;
                 this.mesh.position.y = trackY;
+                // Landing particles
+                for (let i = 0; i < 6; i++) emitParticle(this.x, trackY + 0.2, this.z, 'dust');
+                playCollision();
             } else {
                 this.mesh.position.y = Math.max(trackY, airY);
             }
