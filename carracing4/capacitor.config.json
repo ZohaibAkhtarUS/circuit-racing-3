@@ -1,7 +1,7 @@
 {
   "appId": "com.mikhail.circuitracing4",
   "appName": "Circuit Racing 4",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   },
