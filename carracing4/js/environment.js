@@ -95,7 +95,11 @@ const Environment = (() => {
             snow: [0xccddff, 0x889999],
             volcano: [0x99bbdd, 0x666644],
             sky: [0x88bbff, 0x6699aa],
-            rainbow: [0xaaccff, 0x7799aa]
+            rainbow: [0xaaccff, 0x7799aa],
+            desert: [0xffddaa, 0xaa8844],
+            jungle: [0x88cc88, 0x446622],
+            ice: [0xccddff, 0x88aacc],
+            space: [0x334466, 0x111122]
         };
         const [skyCol, groundCol] = hemiColors[trackDef.theme] || [0xaaddff, 0x88aa66];
         const hemi = new THREE.HemisphereLight(skyCol, groundCol, 0.7);
@@ -147,7 +151,11 @@ const Environment = (() => {
             snow: buildSnowDecos,
             volcano: buildVolcanoDecos,
             sky: buildSkyDecos,
-            rainbow: buildRainbowDecos
+            rainbow: buildRainbowDecos,
+            desert: buildDesertDecos,
+            jungle: buildJungleDecos,
+            ice: buildIceDecos,
+            space: buildSpaceDecos
         };
         if (builders[trackDef.theme]) builders[trackDef.theme](waypoints, scene);
 
@@ -478,6 +486,173 @@ const Environment = (() => {
         if (trackDef.weather === 'clear') return;
 
         // Weather handled by spawning particles each frame in update()
+    }
+
+    function buildDesertDecos(waypoints, scene) {
+        // Cacti
+        for (let i = 0; i < 35; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 20, 70);
+            const trunkGeom = new THREE.CylinderGeometry(0.4, 0.5, 4 + Math.random() * 3, 6);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x338833, roughness: 0.8 });
+            const trunk = new THREE.Mesh(trunkGeom, trunkMat);
+            trunk.position.set(pos.x, pos.y + 2, pos.z);
+            trunk.castShadow = true;
+            scene.add(trunk); decorations.push(trunk);
+            // Arms
+            if (Math.random() > 0.4) {
+                const armGeom = new THREE.CylinderGeometry(0.2, 0.25, 2, 6);
+                const arm = new THREE.Mesh(armGeom, trunkMat);
+                arm.position.set(pos.x + 0.8, pos.y + 3, pos.z);
+                arm.rotation.z = -0.8;
+                scene.add(arm); decorations.push(arm);
+            }
+        }
+        // Sand dunes (big gentle bumps)
+        for (let i = 0; i < 10; i++) {
+            const duneGeom = new THREE.SphereGeometry(8 + Math.random() * 12, 8, 6);
+            const duneMat = new THREE.MeshStandardMaterial({ color: 0xddbb66, roughness: 0.9 });
+            const dune = new THREE.Mesh(duneGeom, duneMat);
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 50 + Math.random() * 80;
+            dune.position.set(Math.cos(angle) * dist, -3, Math.sin(angle) * dist);
+            dune.scale.y = 0.3;
+            scene.add(dune); decorations.push(dune);
+        }
+    }
+
+    function buildJungleDecos(waypoints, scene) {
+        // Dense trees
+        for (let i = 0; i < 50; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 16, 55);
+            // Big jungle tree
+            const trunkGeom = new THREE.CylinderGeometry(0.5, 0.7, 6, 6);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x553311, roughness: 0.9 });
+            const trunk = new THREE.Mesh(trunkGeom, trunkMat);
+            trunk.position.set(pos.x, pos.y + 3, pos.z);
+            trunk.castShadow = true;
+            scene.add(trunk); decorations.push(trunk);
+            // Big bushy canopy
+            const canopyGeom = new THREE.SphereGeometry(3 + Math.random() * 2, 8, 6);
+            const canopyMat = new THREE.MeshStandardMaterial({ color: 0x226622 + Math.floor(Math.random() * 0x224400), roughness: 0.7 });
+            const canopy = new THREE.Mesh(canopyGeom, canopyMat);
+            canopy.position.set(pos.x, pos.y + 7, pos.z);
+            canopy.castShadow = true;
+            scene.add(canopy); decorations.push(canopy);
+        }
+        // Temple ruins (stone blocks)
+        for (let i = 0; i < 8; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 22, 45);
+            const blockGeom = new THREE.BoxGeometry(3 + Math.random() * 2, 4 + Math.random() * 3, 3 + Math.random() * 2);
+            const blockMat = new THREE.MeshStandardMaterial({ color: 0x887766, roughness: 0.9 });
+            const block = new THREE.Mesh(blockGeom, blockMat);
+            block.position.set(pos.x, pos.y + 2, pos.z);
+            block.rotation.y = Math.random() * Math.PI;
+            block.castShadow = true;
+            scene.add(block); decorations.push(block);
+        }
+        // Vines (green cylinders hanging from trees)
+        for (let i = 0; i < 15; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 18, 40);
+            const vineGeom = new THREE.CylinderGeometry(0.05, 0.05, 5, 4);
+            const vineMat = new THREE.MeshStandardMaterial({ color: 0x115511 });
+            const vine = new THREE.Mesh(vineGeom, vineMat);
+            vine.position.set(pos.x, pos.y + 5, pos.z);
+            scene.add(vine); decorations.push(vine);
+        }
+    }
+
+    function buildIceDecos(waypoints, scene) {
+        // Frozen lake surface (big shiny plane)
+        const iceGeom = new THREE.PlaneGeometry(400, 400);
+        const iceMat = new THREE.MeshStandardMaterial({
+            color: 0xaaddff, roughness: 0.05, metalness: 0.8,
+            transparent: true, opacity: 0.6
+        });
+        const ice = new THREE.Mesh(iceGeom, iceMat);
+        ice.rotation.x = -Math.PI / 2;
+        ice.position.y = -0.3;
+        scene.add(ice); decorations.push(ice);
+        // Ice crystals
+        for (let i = 0; i < 25; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 20, 60);
+            const crystalGeom = new THREE.OctahedronGeometry(1 + Math.random() * 2, 0);
+            const crystalMat = new THREE.MeshStandardMaterial({
+                color: 0x88ccff, roughness: 0.1, metalness: 0.7,
+                transparent: true, opacity: 0.7
+            });
+            const crystal = new THREE.Mesh(crystalGeom, crystalMat);
+            crystal.position.set(pos.x, pos.y + 1.5, pos.z);
+            crystal.rotation.set(Math.random(), Math.random(), Math.random());
+            crystal.castShadow = true;
+            scene.add(crystal); decorations.push(crystal);
+        }
+        // Snow-covered pine trees
+        for (let i = 0; i < 20; i++) {
+            const pos = getRandomOutsideTrack(waypoints, 22, 55);
+            buildPineTree(pos.x, pos.y, pos.z, scene, true);
+        }
+    }
+
+    function buildSpaceDecos(waypoints, scene) {
+        // Star field
+        const starCount = 800;
+        const starPositions = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount; i++) {
+            starPositions[i * 3] = (Math.random() - 0.5) * 400;
+            starPositions[i * 3 + 1] = Math.random() * 150 - 30;
+            starPositions[i * 3 + 2] = (Math.random() - 0.5) * 400;
+        }
+        const starGeom = new THREE.BufferGeometry();
+        starGeom.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starMat = new THREE.PointsMaterial({ size: 1.5, color: 0xffffff, blending: THREE.AdditiveBlending });
+        const stars = new THREE.Points(starGeom, starMat);
+        scene.add(stars); decorations.push(stars);
+        // Space station modules (metallic cylinders and boxes)
+        for (let i = 0; i < waypoints.length; i += 20) {
+            const wp = waypoints[i];
+            // Support beam
+            const beamGeom = new THREE.CylinderGeometry(1, 1.5, wp.y || 35, 8);
+            const beamMat = new THREE.MeshStandardMaterial({ color: 0x667788, metalness: 0.8, roughness: 0.2 });
+            const beam = new THREE.Mesh(beamGeom, beamMat);
+            beam.position.set(wp.x, (wp.y || 35) / 2, wp.z);
+            scene.add(beam); decorations.push(beam);
+        }
+        // Floating satellites
+        for (let i = 0; i < 8; i++) {
+            const satGroup = new THREE.Group();
+            const bodyGeom = new THREE.BoxGeometry(2, 2, 3);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x888899, metalness: 0.7, roughness: 0.2 });
+            satGroup.add(new THREE.Mesh(bodyGeom, bodyMat));
+            // Solar panels
+            const panelGeom = new THREE.BoxGeometry(6, 0.1, 2);
+            const panelMat = new THREE.MeshStandardMaterial({ color: 0x2244aa, metalness: 0.5 });
+            const panelL = new THREE.Mesh(panelGeom, panelMat);
+            panelL.position.x = -4;
+            satGroup.add(panelL);
+            const panelR = new THREE.Mesh(panelGeom, panelMat);
+            panelR.position.x = 4;
+            satGroup.add(panelR);
+            satGroup.position.set(
+                (Math.random() - 0.5) * 200,
+                40 + Math.random() * 30,
+                (Math.random() - 0.5) * 200
+            );
+            satGroup.userData.rotSpeed = { x: 0, y: 0.2 + Math.random() * 0.3 };
+            scene.add(satGroup); decorations.push(satGroup);
+        }
+        // Planet in sky
+        const planetGeom = new THREE.SphereGeometry(20, 16, 16);
+        const planetMat = new THREE.MeshStandardMaterial({ color: 0xcc6633, roughness: 0.8 });
+        const planet = new THREE.Mesh(planetGeom, planetMat);
+        planet.position.set(150, 80, -100);
+        scene.add(planet); decorations.push(planet);
+        // Ring around planet
+        const ringGeom = new THREE.TorusGeometry(30, 2, 4, 32);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0xddaa66, roughness: 0.5 });
+        const ring = new THREE.Mesh(ringGeom, ringMat);
+        ring.position.copy(planet.position);
+        ring.rotation.x = 0.8;
+        scene.add(ring); decorations.push(ring);
     }
 
     function getRandomOutsideTrack(waypoints, minDist, maxDist) {

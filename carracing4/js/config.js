@@ -102,6 +102,46 @@ const TRACK_DEFS = [
         fogColor: 0x6699cc, fogDensity: 0.003,
         roadWidth: 22, laps: 2,
         unlockRequires: { type: 'winAll' }
+    },
+    {
+        id: 6, name: 'Desert Dunes', theme: 'desert',
+        description: 'Race across the golden sands and dodge the cacti!',
+        icon: '\u{1F3DC}', weather: 'clear', timeOfDay: 'morning',
+        roadColor: '#665544', groundColor: '#ddbb66',
+        skyColors: ['#5599dd', '#77bbee', '#aaddff', '#eeeedd'],
+        fogColor: 0xccbb99, fogDensity: 0.004,
+        roadWidth: 26, laps: 2,
+        unlockRequires: { type: 'top3', trackId: 2 }
+    },
+    {
+        id: 7, name: 'Jungle Temple', theme: 'jungle',
+        description: 'Zoom through the ancient jungle temple ruins!',
+        icon: '\u{1F334}', weather: 'clear', timeOfDay: 'morning',
+        roadColor: '#445533', groundColor: '#337722',
+        skyColors: ['#448855', '#66aa77', '#88ccaa', '#aaddcc'],
+        fogColor: 0x66aa77, fogDensity: 0.007,
+        roadWidth: 22, laps: 2,
+        unlockRequires: { type: 'wins', count: 4 }
+    },
+    {
+        id: 8, name: 'Ice Lake', theme: 'ice',
+        description: 'Slide and drift on the frozen mega lake!',
+        icon: '\u{1F9CA}', weather: 'snow', timeOfDay: 'morning',
+        roadColor: '#8899bb', groundColor: '#aaccee',
+        skyColors: ['#6699cc', '#88bbdd', '#bbddee', '#ddeeff'],
+        fogColor: 0xaaccdd, fogDensity: 0.005,
+        roadWidth: 28, laps: 2,
+        unlockRequires: { type: 'wins', count: 5 }
+    },
+    {
+        id: 9, name: 'Space Station', theme: 'space',
+        description: 'Race in zero gravity around the space station!',
+        icon: '\u{1F680}', weather: 'clear', timeOfDay: 'morning',
+        roadColor: '#334455', groundColor: '#111122',
+        skyColors: ['#050510', '#0a0a22', '#111144', '#0a0a22'],
+        fogColor: 0x0a0a22, fogDensity: 0.002,
+        roadWidth: 24, laps: 2,
+        unlockRequires: { type: 'trophies', count: 6 }
     }
 ];
 

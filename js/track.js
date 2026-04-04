@@ -30,13 +30,27 @@ function getTrackWaypoints(trackId) {
             x = cx + Math.cos(t) * rx;
             z = cz + Math.sin(t) * rz;
             y = Math.sin(t * 2) * 5 + Math.cos(t * 4) * 2;
-        } else {
+        } else if (trackId === 3) {
             // Islamabad GP - flowing with dramatic Margalla Hills elevation
             const rx = 80 + Math.sin(t * 2) * 22 + Math.cos(t * 5) * 8;
             const rz = 55 + Math.cos(t * 3) * 18;
             x = cx + Math.cos(t) * rx;
             z = cz + Math.sin(t) * rz;
             y = Math.sin(t * 2) * 6 + Math.cos(t * 3) * 3 + Math.sin(t * 6) * 1.5;
+        } else if (trackId === 4) {
+            // Frozen Lake - wide icy oval, mostly flat
+            const rx = 95 + Math.sin(t * 2) * 10;
+            const rz = 60 + Math.cos(t * 2) * 8;
+            x = cx + Math.cos(t) * rx;
+            z = cz + Math.sin(t) * rz;
+            y = Math.sin(t * 3) * 1.2 + Math.cos(t * 2) * 0.8;
+        } else {
+            // Canyon Run - rocky narrow canyon with elevation changes
+            const rx = 70 + Math.sin(t * 4) * 18;
+            const rz = 50 + Math.cos(t * 3) * 15;
+            x = cx + Math.cos(t) * rx;
+            z = cz + Math.sin(t) * rz;
+            y = Math.sin(t * 2) * 7 + Math.cos(t * 5) * 3 + Math.sin(t * 3) * 2;
         }
 
         pts.push(new THREE.Vector3(x, Math.max(y, 0), z));

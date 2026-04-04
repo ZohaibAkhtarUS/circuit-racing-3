@@ -44,13 +44,38 @@ const Track = (() => {
                     z = Math.cos(t) * 70 + Math.sin(t * 2) * 8;
                     y = 30 + Math.sin(t * 2) * 3;
                     break;
-                case 5: // Rainbow Road - peanut/figure-8-ish but non-crossing
+                case 5: // Rainbow Road
                     {
-                        // Use a limacon-like shape that doesn't cross itself
                         const r = 55 + Math.cos(t * 2) * 20;
                         x = Math.sin(t) * r;
                         z = Math.cos(t) * (r * 0.75);
                         y = 20 + Math.sin(t * 2) * 4 + Math.cos(t * 3) * 2;
+                    }
+                    break;
+                case 6: // Desert Dunes - wide sweeping oval
+                    x = Math.sin(t) * 100 + Math.cos(t * 2) * 15;
+                    z = Math.cos(t) * 70 + Math.sin(t * 2) * 10;
+                    y = Math.sin(t * 2) * 2 + Math.abs(Math.sin(t * 3)) * 3;
+                    break;
+                case 7: // Jungle Temple - tighter twisty loop
+                    {
+                        const r = 55 + Math.cos(t * 2) * 12;
+                        x = Math.sin(t) * r + Math.cos(t * 2) * 8;
+                        z = Math.cos(t) * (r * 0.85);
+                        y = Math.sin(t * 2) * 2;
+                    }
+                    break;
+                case 8: // Ice Lake - big wide smooth oval
+                    x = Math.sin(t) * 95 + Math.cos(t * 2) * 8;
+                    z = Math.cos(t) * 75 + Math.sin(t * 2) * 6;
+                    y = Math.sin(t * 2) * 1;
+                    break;
+                case 9: // Space Station - elevated loop with gentle curves
+                    {
+                        const r = 65 + Math.cos(t * 2) * 15;
+                        x = Math.sin(t) * r;
+                        z = Math.cos(t) * (r * 0.8);
+                        y = 35 + Math.sin(t * 2) * 3 + Math.cos(t * 3) * 2;
                     }
                     break;
             }
@@ -170,7 +195,7 @@ const Track = (() => {
         buildCurbs(waypoints, halfWidth, trackDef, scene);
 
         // Walls (not for Sky Highway or Rainbow Road)
-        if (trackDef.theme !== 'sky' && trackDef.theme !== 'rainbow') {
+        if (trackDef.theme !== 'sky' && trackDef.theme !== 'rainbow' && trackDef.theme !== 'space') {
             buildWalls(waypoints, halfWidth, trackDef, scene);
         }
 
@@ -377,7 +402,7 @@ const Track = (() => {
     function buildGround(trackDef, scene) {
         const size = 500;
 
-        if (trackDef.theme === 'sky' || trackDef.theme === 'rainbow') {
+        if (trackDef.theme === 'sky' || trackDef.theme === 'rainbow' || trackDef.theme === 'space') {
             // No ground for sky/rainbow - just void
             return;
         }

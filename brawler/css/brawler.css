@@ -246,13 +246,13 @@ html, body {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    width: 170px;
-    height: 170px;
+    width: 204px;
+    height: 204px;
     pointer-events: auto;
 }
 #joystick-base {
-    width: 160px;
-    height: 160px;
+    width: 192px;
+    height: 192px;
     border-radius: 50%;
     background: rgba(255,255,255,0.12);
     border: 3px solid rgba(255,255,255,0.3);
@@ -262,8 +262,8 @@ html, body {
     justify-content: center;
 }
 #joystick-thumb {
-    width: 64px;
-    height: 64px;
+    width: 77px;
+    height: 77px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,0.65), rgba(255,255,255,0.25));
     border: 2px solid rgba(255,255,255,0.5);
@@ -307,31 +307,31 @@ html, body {
 }
 
 #btn-attack {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     background: radial-gradient(circle, #ff4444, #cc1111);
     border-color: #ff6666;
 }
 #btn-kick {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     background: radial-gradient(circle, #4488ff, #1155cc);
     border-color: #66aaff;
 }
 #btn-jump {
-    width: 88px;
-    height: 60px;
-    border-radius: 30px;
+    width: 106px;
+    height: 72px;
+    border-radius: 36px;
     background: radial-gradient(circle, #44cc44, #119911);
     border-color: #66dd66;
-    font-size: 13px;
+    font-size: 15px;
 }
 #btn-special {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
     background: radial-gradient(circle, #ffaa00, #cc7700);
     border-color: #ffcc44;
-    font-size: 10px;
+    font-size: 12px;
 }
 #btn-special.disabled {
     background: radial-gradient(circle, #555, #333);
@@ -410,12 +410,12 @@ html, body {
     .menu-btn { padding: 10px 36px; font-size: 16px; }
     .overlay-title { font-size: 24px; }
     .overlay { gap: 8px; }
-    #joystick-zone { width: 140px; height: 140px; }
-    #joystick-base { width: 130px; height: 130px; }
-    #joystick-thumb { width: 52px; height: 52px; }
-    #btn-attack, #btn-kick { width: 68px; height: 68px; font-size: 11px; }
-    #btn-jump { width: 74px; height: 52px; font-size: 11px; }
-    #btn-special { width: 50px; height: 50px; font-size: 9px; }
+    #joystick-zone { width: 168px; height: 168px; }
+    #joystick-base { width: 156px; height: 156px; }
+    #joystick-thumb { width: 62px; height: 62px; }
+    #btn-attack, #btn-kick { width: 82px; height: 82px; font-size: 12px; }
+    #btn-jump { width: 89px; height: 62px; font-size: 12px; }
+    #btn-special { width: 60px; height: 60px; font-size: 10px; }
     #mobile-buttons { gap: 6px; bottom: 8px; right: 8px; }
     #attack-row { gap: 8px; }
     .char-option { width: 65px; height: 85px; }
@@ -424,14 +424,14 @@ html, body {
 
 /* ===== RESPONSIVE: iPad / Tablet (touch, big screen) ===== */
 @media (min-width: 768px) and (pointer: coarse) {
-    #joystick-zone { bottom: 30px; left: 30px; width: 200px; height: 200px; }
-    #joystick-base { width: 190px; height: 190px; }
-    #joystick-thumb { width: 76px; height: 76px; }
-    #mobile-buttons { bottom: 20px; right: 20px; gap: 12px; }
-    #attack-row { gap: 14px; }
-    #btn-attack, #btn-kick { width: 96px; height: 96px; font-size: 14px; }
-    #btn-jump { width: 105px; height: 72px; font-size: 15px; border-radius: 36px; }
-    #btn-special { width: 72px; height: 72px; font-size: 12px; }
+    #joystick-zone { bottom: 30px; left: 30px; width: 240px; height: 240px; }
+    #joystick-base { width: 228px; height: 228px; }
+    #joystick-thumb { width: 91px; height: 91px; }
+    #mobile-buttons { bottom: 20px; right: 20px; gap: 14px; }
+    #attack-row { gap: 16px; }
+    #btn-attack, #btn-kick { width: 115px; height: 115px; font-size: 16px; }
+    #btn-jump { width: 126px; height: 86px; font-size: 17px; border-radius: 43px; }
+    #btn-special { width: 86px; height: 86px; font-size: 14px; }
     #btn-pause { width: 52px; height: 52px; font-size: 24px; }
     .game-title { font-size: 56px; }
     .menu-btn { padding: 18px 56px; font-size: 24px; min-width: 240px; }

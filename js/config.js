@@ -51,13 +51,15 @@ const ITEM_LISTS = {
     hard:   [ITEMS.BOOST, ITEMS.SHIELD, ITEMS.MISSILE, ITEMS.MISSILE, ITEMS.OIL, ITEMS.OIL, ITEMS.BANANA, ITEMS.LIGHTNING]
 };
 
-const TRACK_NAMES = ['Green Valley', 'Desert Circuit', 'Mountain Pass', 'Islamabad GP'];
+const TRACK_NAMES = ['Green Valley', 'Desert Circuit', 'Mountain Pass', 'Islamabad GP', 'Frozen Lake', 'Canyon Run'];
 
 const TRACK_THEMES = {
     0: { sky: 0x7ec8e3, fog: 0x7ec8e3, ground: '#2d5a1e', sunColor: 0xffeedd, sunIntensity: 1.1, ambientColor: 0x505070, hemiSky: 0x87ceeb, hemiGround: 0x2d5a1e, name: 'Green Valley' },
     1: { sky: 0xe8c87a, fog: 0xe8c87a, ground: '#c4a35a', sunColor: 0xffffff, sunIntensity: 1.4, ambientColor: 0x706050, hemiSky: 0xe8c87a, hemiGround: 0x8b7355, name: 'Desert Circuit' },
     2: { sky: 0x8aafc7, fog: 0x8aafc7, ground: '#3a6b3a', sunColor: 0xccddff, sunIntensity: 0.9, ambientColor: 0x405060, hemiSky: 0x8aafc7, hemiGround: 0x3a6b3a, name: 'Mountain Pass' },
-    3: { sky: 0x87ceeb, fog: 0xa8d8ea, ground: '#2a6e2a', sunColor: 0xffe8cc, sunIntensity: 1.2, ambientColor: 0x556070, hemiSky: 0x87ceeb, hemiGround: 0x2a6e2a, name: 'Islamabad GP' }
+    3: { sky: 0x87ceeb, fog: 0xa8d8ea, ground: '#2a6e2a', sunColor: 0xffe8cc, sunIntensity: 1.2, ambientColor: 0x556070, hemiSky: 0x87ceeb, hemiGround: 0x2a6e2a, name: 'Islamabad GP' },
+    4: { sky: 0xd0e8f5, fog: 0xc8dff0, ground: '#b8d4e8', sunColor: 0xddeeff, sunIntensity: 0.8, ambientColor: 0x607080, hemiSky: 0xd0e8f5, hemiGround: 0x8aaccc, name: 'Frozen Lake' },
+    5: { sky: 0xd4956b, fog: 0xc48860, ground: '#8b4513', sunColor: 0xffccaa, sunIntensity: 1.3, ambientColor: 0x604030, hemiSky: 0xd4956b, hemiGround: 0x6b3410, name: 'Canyon Run' }
 };
 
 // Graphics quality presets

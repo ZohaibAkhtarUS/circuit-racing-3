@@ -357,11 +357,19 @@ class GameCar {
         this.currentLapTime += dt;
         this.totalTime += dt;
 
-        // Exhaust particles
-        if (this.speed > 20 && Math.random() > 0.8) {
-            const behindX = this.x - Math.sin(this.angle) * 2.2;
-            const behindZ = this.z - Math.cos(this.angle) * 2.2;
-            Particles.emit(behindX, this.y + 0.4, behindZ, 'smoke', 1);
+        // Exhaust particles - flames when fast!
+        if (this.speed > 20) {
+            const behindX = this.x - Math.sin(this.angle) * 2.5;
+            const behindZ = this.z - Math.cos(this.angle) * 2.5;
+            if (this.speed > 100) {
+                // Big orange flames at high speed
+                Particles.emit(behindX, this.y + 0.3, behindZ, 'fire', 2);
+                if (Math.random() > 0.5) Particles.emit(behindX, this.y + 0.5, behindZ, 'spark', 1);
+            } else if (this.speed > 50) {
+                Particles.emit(behindX, this.y + 0.4, behindZ, 'smoke', 1);
+            } else if (Math.random() > 0.7) {
+                Particles.emit(behindX, this.y + 0.4, behindZ, 'smoke', 1);
+            }
         }
 
         // Engine sound

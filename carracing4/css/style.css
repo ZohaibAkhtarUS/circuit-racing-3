@@ -794,32 +794,33 @@ canvas { display: block; }
 }
 .mob-btn:active { background: rgba(255,255,255,0.25); }
 #mob-left {
-    bottom: 10px; left: 10px;
-    width: 30vw; height: 30vh;
+    bottom: 0; left: 0;
+    width: 40vw; height: 40vh;
     border-radius: 16px;
-    font-size: 2rem;
+    font-size: 3rem;
 }
 #mob-right {
-    bottom: 10px; right: 10px;
-    width: 30vw; height: 30vh;
+    bottom: 0; right: 0;
+    width: 40vw; height: 40vh;
     border-radius: 16px;
-    font-size: 2rem;
+    font-size: 3rem;
 }
 #mob-brake {
-    bottom: 10px; left: 50%;
+    bottom: 0; left: 50%;
     transform: translateX(-50%);
-    width: 25vw; height: 10vh;
+    width: 20vw; height: 12vh;
     border-radius: 12px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     letter-spacing: 3px;
 }
 .mob-circle {
-    width: 60px; height: 60px;
+    width: 70px; height: 70px;
     border-radius: 50%;
+    font-size: 1.4rem;
 }
-#mob-nitro { top: 20px; right: 10px; background: rgba(0,100,255,0.3); border-color: rgba(0,150,255,0.5); }
-#mob-item { top: 90px; right: 10px; background: rgba(255,150,0,0.3); border-color: rgba(255,170,0,0.5); font-size: 0.7rem; }
-#mob-drift { top: 160px; right: 10px; background: rgba(255,0,100,0.3); border-color: rgba(255,50,120,0.5); font-size: 0.6rem; letter-spacing: 1px; }
+#mob-nitro { top: 15px; right: 10px; width: 80px; height: 80px; background: rgba(0,100,255,0.4); border-color: rgba(0,150,255,0.6); }
+#mob-item { top: 105px; right: 10px; width: 80px; height: 80px; background: rgba(255,150,0,0.4); border-color: rgba(255,170,0,0.6); font-size: 0.8rem; }
+#mob-drift { top: 195px; right: 10px; width: 80px; height: 80px; background: rgba(255,0,100,0.4); border-color: rgba(255,50,120,0.6); font-size: 0.7rem; letter-spacing: 1px; }
 
 /* ===== SPEED LINES ===== */
 #speed-lines {

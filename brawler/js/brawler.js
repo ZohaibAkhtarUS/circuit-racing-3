@@ -106,6 +106,48 @@ const LEVELS = [
         ],
         boss: 4
     },
+    {
+        name: 'Islamabad Streets', width: 5500, sky: ['#6cacdf','#c8e0f0'], ground: '#707a6a', groundAlt: '#606a5a',
+        bgElements: 'islamabad',
+        waves: [
+            { triggerX: 300, enemies: [{ type: 'goon', count: 3 }] },
+            { triggerX: 900, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 1 }] },
+            { triggerX: 1600, enemies: [{ type: 'brute', count: 2 }, { type: 'goon', count: 2 }] },
+            { triggerX: 2400, enemies: [{ type: 'goon', count: 3 }, { type: 'brute', count: 2 }] },
+            { triggerX: 3400, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 2 }] },
+            { triggerX: 4500, enemies: [{ type: 'brute', count: 2 }, { type: 'goon', count: 3 }] },
+        ],
+        boss: 0
+    },
+    {
+        name: 'Haunted Castle', width: 5800, sky: ['#1a0a2e','#3a2a4e'], ground: '#3a3a44', groundAlt: '#2e2e38',
+        bgElements: 'castle',
+        waves: [
+            { triggerX: 300, enemies: [{ type: 'ninja', count: 2 }] },
+            { triggerX: 800, enemies: [{ type: 'ninja', count: 3 }] },
+            { triggerX: 1500, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 2 }] },
+            { triggerX: 2200, enemies: [{ type: 'ninja', count: 3 }, { type: 'brute', count: 1 }] },
+            { triggerX: 3000, enemies: [{ type: 'ninja', count: 4 }] },
+            { triggerX: 3800, enemies: [{ type: 'ninja', count: 3 }, { type: 'robot', count: 1 }] },
+            { triggerX: 4700, enemies: [{ type: 'ninja', count: 4 }, { type: 'brute', count: 1 }] },
+        ],
+        boss: 1
+    },
+    {
+        name: 'Space Arena', width: 6500, sky: ['#050510','#0a0a20'], ground: '#4a4a5a', groundAlt: '#3e3e4e',
+        bgElements: 'space',
+        waves: [
+            { triggerX: 300, enemies: [{ type: 'robot', count: 2 }, { type: 'goon', count: 1 }] },
+            { triggerX: 900, enemies: [{ type: 'ninja', count: 2 }, { type: 'robot', count: 1 }] },
+            { triggerX: 1600, enemies: [{ type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
+            { triggerX: 2400, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 1 }, { type: 'goon', count: 2 }] },
+            { triggerX: 3200, enemies: [{ type: 'ninja', count: 3 }, { type: 'robot', count: 2 }] },
+            { triggerX: 4000, enemies: [{ type: 'brute', count: 2 }, { type: 'robot', count: 2 }, { type: 'ninja', count: 1 }] },
+            { triggerX: 4800, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
+            { triggerX: 5600, enemies: [{ type: 'robot', count: 3 }, { type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
+        ],
+        boss: 4
+    },
 ];
 
 // --- BODY SCALE CONSTANTS ---
@@ -897,8 +939,12 @@ function drawCharacter(ctx, entity, colors, isEnemy) {
         ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
     }
 
-    // White flash overlay
+    // White flash overlay - bright flash on hit
     if (flashTimer > 0) {
+        ctx.globalCompositeOperation = 'source-atop';
+        const flashAlpha = Math.min(1, flashTimer * 6);
+        ctx.fillStyle = `rgba(255,255,255,${flashAlpha * 0.7})`;
+        ctx.fillRect(-w * 1.5, -h * 2.5, w * 3, h * 3);
         ctx.globalCompositeOperation = 'source-over';
     }
 
@@ -926,6 +972,30 @@ function generateBgElements(level) {
             bgElements.push({ type: 'machine', x, w: rnd(50, 100), h: rnd(60, 120) });
         } else if (type === 'fortress') {
             bgElements.push({ type: 'pillar', x, h: rnd(100, 200) });
+        } else if (type === 'islamabad') {
+            if (Math.random() < 0.4) {
+                bgElements.push({ type: 'isb_building', x, w: rnd(70, 130), h: rnd(80, 200), color: `hsl(${rnd(30,50)}, ${rnd(15,30)}%, ${rnd(55,75)}%)` });
+            } else if (Math.random() < 0.5) {
+                bgElements.push({ type: 'isb_tree', x: x + rnd(0,40), size: rnd(45, 80) });
+            } else {
+                bgElements.push({ type: 'isb_car', x: x + rnd(0,30), color: `hsl(${rnd(0,360)}, ${rnd(50,80)}%, ${rnd(40,60)}%)` });
+            }
+        } else if (type === 'castle') {
+            if (Math.random() < 0.4) {
+                bgElements.push({ type: 'castle_pillar', x, h: rnd(120, 250) });
+            } else if (Math.random() < 0.5) {
+                bgElements.push({ type: 'castle_torch', x: x + rnd(0,30), h: rnd(60, 100) });
+            } else {
+                bgElements.push({ type: 'castle_bat', x: x + rnd(0,60), y: rnd(30, 120), size: rnd(8, 16) });
+            }
+        } else if (type === 'space') {
+            if (Math.random() < 0.35) {
+                bgElements.push({ type: 'space_panel', x, w: rnd(60, 110), h: rnd(50, 100) });
+            } else if (Math.random() < 0.5) {
+                bgElements.push({ type: 'space_screen', x: x + rnd(0,30), w: rnd(40, 70), h: rnd(30, 55) });
+            } else {
+                bgElements.push({ type: 'space_tube', x: x + rnd(0,20), h: rnd(80, 160) });
+            }
         }
     }
 
@@ -946,7 +1016,7 @@ function drawBackground(ctx, level) {
     ctx.fillRect(0, 0, W, WALK_MIN_Y);
 
     // Sun / Moon
-    if (level <= 1) {
+    if (level <= 1 || lv.bgElements === 'islamabad') {
         // Sun
         drawSoftGlow(ctx, W - 80, 60, 40, '#ffdd44', 0.15);
         drawGradCircle(ctx, W - 80, 60, 22, '#ffee66', '#ffaa00');
@@ -1021,6 +1091,58 @@ function drawBackground(ctx, level) {
                 ctx.strokeRect(gx2, gy, 38, 16);
             }
         }
+    } else if (groundType === 'islamabad') {
+        // Road markings and sidewalk
+        ctx.fillStyle = shadeColor(lv.ground, -0.08);
+        ctx.fillRect(0, WALK_MIN_Y + 30, W, 4);
+        // Dashed center line
+        ctx.fillStyle = '#cccc88';
+        for (let gx2 = -camera.x % 40; gx2 < W; gx2 += 40) {
+            ctx.fillRect(gx2, WALK_MIN_Y + 60, 20, 3);
+        }
+        // Sidewalk edge
+        ctx.fillStyle = shadeColor(lv.ground, 0.12);
+        ctx.fillRect(0, WALK_MIN_Y, W, 8);
+    } else if (groundType === 'castle') {
+        // Dark stone floor with cracks
+        ctx.strokeStyle = shadeColor(lv.ground, -0.15); ctx.lineWidth = 0.8;
+        for (let gy = WALK_MIN_Y; gy < H; gy += 22) {
+            const offset = (gy / 22) % 2 === 0 ? 0 : 18;
+            for (let gx2 = offset - camera.x % 36; gx2 < W; gx2 += 36) {
+                ctx.strokeRect(gx2, gy, 34, 20);
+                // Random crack
+                if (((gx2 * 7 + gy * 3) & 0xff) > 200) {
+                    ctx.beginPath();
+                    ctx.moveTo(gx2 + 10, gy + 5);
+                    ctx.lineTo(gx2 + 18, gy + 12);
+                    ctx.lineTo(gx2 + 25, gy + 10);
+                    ctx.stroke();
+                }
+            }
+        }
+        // Purple mist at ground level
+        const mistGrad = ctx.createLinearGradient(0, WALK_MIN_Y, 0, WALK_MIN_Y + 30);
+        mistGrad.addColorStop(0, 'rgba(100,50,150,0.15)');
+        mistGrad.addColorStop(1, 'rgba(100,50,150,0)');
+        ctx.fillStyle = mistGrad;
+        ctx.fillRect(0, WALK_MIN_Y, W, 30);
+    } else if (groundType === 'space') {
+        // Metallic floor panels
+        ctx.strokeStyle = shadeColor(lv.ground, 0.15); ctx.lineWidth = 1;
+        for (let gx2 = -camera.x % 50; gx2 < W; gx2 += 50) {
+            for (let gy = WALK_MIN_Y; gy < H; gy += 35) {
+                ctx.strokeRect(gx2, gy, 48, 33);
+                // Corner rivets
+                ctx.fillStyle = shadeColor(lv.ground, 0.25);
+                for (const corner of [[3,3],[45,3],[3,30],[45,30]]) {
+                    ctx.beginPath(); ctx.arc(gx2 + corner[0], gy + corner[1], 1.5, 0, Math.PI*2); ctx.fill();
+                }
+            }
+        }
+        // Glowing floor strip
+        const stripGlow = 0.3 + Math.sin(Date.now() * 0.003) * 0.15;
+        ctx.fillStyle = `rgba(0,200,255,${stripGlow})`;
+        ctx.fillRect(0, WALK_MIN_Y + 2, W, 2);
     }
 
     // Ground-line shadow at WALK_MIN_Y
@@ -1100,6 +1222,180 @@ function drawBackground(ctx, level) {
             case 'pillar':
                 drawGradRect(ctx, px, WALK_MIN_Y - el.h, 30, el.h, '#665555', '#443333', 2);
                 drawGradRect(ctx, px - 5, WALK_MIN_Y - el.h, 40, 15, '#776666', '#554444', 3);
+                break;
+            case 'isb_building':
+                // Islamabad-style building with warm tones
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, el.w, el.h, el.color, shadeColor(el.color, -0.25), 2);
+                // Flat roof with parapet
+                ctx.fillStyle = shadeColor(el.color, -0.15);
+                ctx.fillRect(px - 3, WALK_MIN_Y - el.h, el.w + 6, 8);
+                // Windows
+                for (let wy = WALK_MIN_Y - el.h + 20; wy < WALK_MIN_Y - 12; wy += 22) {
+                    for (let wx = px + 8; wx < px + el.w - 8; wx += 18) {
+                        if (((wx * 11 + wy * 7) & 0xff) > 90) {
+                            ctx.fillStyle = '#ffee88';
+                            ctx.fillRect(wx, wy, 10, 14);
+                            ctx.fillStyle = 'rgba(255,238,136,0.3)';
+                            ctx.fillRect(wx - 2, wy - 2, 14, 18);
+                        }
+                    }
+                }
+                break;
+            case 'isb_tree':
+                // Green tree with thick trunk
+                drawGradRect(ctx, px - 5, WALK_MIN_Y - el.size * 0.5, 10, el.size * 0.5, '#5a3a1a', '#3a2a0a', 2);
+                drawGradCircle(ctx, px, WALK_MIN_Y - el.size * 0.55, el.size * 0.4, '#2a8a2a', '#1a5a1a');
+                drawGradCircle(ctx, px - 8, WALK_MIN_Y - el.size * 0.45, el.size * 0.3, '#3a9a3a', '#2a7a2a');
+                drawGradCircle(ctx, px + 8, WALK_MIN_Y - el.size * 0.48, el.size * 0.32, '#34944a', '#1a6a2a');
+                break;
+            case 'isb_car':
+                // Parked car silhouette
+                ctx.fillStyle = el.color;
+                drawRR(ctx, px, WALK_MIN_Y - 22, 40, 16, 4, el.color);
+                drawRR(ctx, px + 6, WALK_MIN_Y - 32, 28, 12, 3, shadeColor(el.color, -0.15));
+                // Wheels
+                ctx.fillStyle = '#222';
+                ctx.beginPath(); ctx.arc(px + 10, WALK_MIN_Y - 5, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(px + 32, WALK_MIN_Y - 5, 5, 0, Math.PI * 2); ctx.fill();
+                // Window shine
+                ctx.fillStyle = 'rgba(150,200,255,0.4)';
+                ctx.fillRect(px + 10, WALK_MIN_Y - 30, 10, 8);
+                ctx.fillRect(px + 22, WALK_MIN_Y - 30, 10, 8);
+                break;
+            case 'castle_pillar':
+                // Gothic stone pillar
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, 28, el.h, '#665566', '#443344', 2);
+                // Capital / top decoration
+                drawGradRect(ctx, px - 5, WALK_MIN_Y - el.h, 38, 12, '#776677', '#554455', 3);
+                // Pointed arch at top
+                ctx.fillStyle = '#776677';
+                ctx.beginPath();
+                ctx.moveTo(px - 2, WALK_MIN_Y - el.h);
+                ctx.lineTo(px + 14, WALK_MIN_Y - el.h - 18);
+                ctx.lineTo(px + 30, WALK_MIN_Y - el.h);
+                ctx.closePath(); ctx.fill();
+                // Stone lines
+                ctx.strokeStyle = '#3a2a3a'; ctx.lineWidth = 0.8;
+                for (let sy = WALK_MIN_Y - el.h + 20; sy < WALK_MIN_Y - 5; sy += 16) {
+                    ctx.beginPath(); ctx.moveTo(px + 2, sy); ctx.lineTo(px + 26, sy); ctx.stroke();
+                }
+                break;
+            case 'castle_torch':
+                // Wall-mounted torch
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, 8, el.h, '#5a4a3a', '#3a2a1a', 1);
+                // Bracket
+                ctx.fillStyle = '#6a5a4a';
+                ctx.fillRect(px - 3, WALK_MIN_Y - el.h + 4, 14, 5);
+                // Flame glow
+                {
+                    const flameFlicker = 0.7 + Math.sin(Date.now() * 0.008 + px * 0.1) * 0.3;
+                    const fg = ctx.createRadialGradient(px + 4, WALK_MIN_Y - el.h - 5, 0, px + 4, WALK_MIN_Y - el.h - 5, 20);
+                    fg.addColorStop(0, `rgba(255,150,30,${0.6 * flameFlicker})`);
+                    fg.addColorStop(0.5, `rgba(255,80,0,${0.3 * flameFlicker})`);
+                    fg.addColorStop(1, 'rgba(255,50,0,0)');
+                    ctx.fillStyle = fg;
+                    ctx.fillRect(px - 16, WALK_MIN_Y - el.h - 25, 40, 40);
+                    // Flame core
+                    ctx.fillStyle = `rgba(255,220,80,${0.9 * flameFlicker})`;
+                    ctx.beginPath();
+                    ctx.moveTo(px, WALK_MIN_Y - el.h);
+                    ctx.quadraticCurveTo(px + 4, WALK_MIN_Y - el.h - 14 * flameFlicker, px + 8, WALK_MIN_Y - el.h);
+                    ctx.fill();
+                }
+                break;
+            case 'castle_bat':
+                // Animated bat silhouette
+                {
+                    const wingPhase = Math.sin(Date.now() * 0.01 + el.x * 0.5) * 0.6;
+                    ctx.fillStyle = '#1a1a2e';
+                    ctx.save();
+                    ctx.translate(px, el.y);
+                    // Body
+                    ctx.beginPath(); ctx.ellipse(0, 0, el.size * 0.3, el.size * 0.2, 0, 0, Math.PI * 2); ctx.fill();
+                    // Left wing
+                    ctx.beginPath();
+                    ctx.moveTo(-2, 0);
+                    ctx.quadraticCurveTo(-el.size * 0.6, -el.size * wingPhase, -el.size, el.size * 0.1 * wingPhase);
+                    ctx.lineTo(-el.size * 0.4, el.size * 0.15);
+                    ctx.closePath(); ctx.fill();
+                    // Right wing
+                    ctx.beginPath();
+                    ctx.moveTo(2, 0);
+                    ctx.quadraticCurveTo(el.size * 0.6, -el.size * wingPhase, el.size, el.size * 0.1 * wingPhase);
+                    ctx.lineTo(el.size * 0.4, el.size * 0.15);
+                    ctx.closePath(); ctx.fill();
+                    // Eyes
+                    ctx.fillStyle = '#ff3333';
+                    ctx.beginPath(); ctx.arc(-2, -1, 1.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(2, -1, 1.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                }
+                break;
+            case 'space_panel':
+                // Control panel
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, el.w, el.h, '#3a4a5a', '#2a3a4a', 3);
+                // Panel border
+                ctx.strokeStyle = '#5a7a9a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(px + 2, WALK_MIN_Y - el.h + 2, el.w - 4, el.h - 4);
+                // Blinking lights
+                for (let lx = px + 8; lx < px + el.w - 8; lx += 14) {
+                    for (let ly = WALK_MIN_Y - el.h + 12; ly < WALK_MIN_Y - 8; ly += 14) {
+                        const blink = Math.sin(Date.now() * 0.003 + lx * 0.2 + ly * 0.3) > 0;
+                        const lColor = blink ? ['#44ff44','#ff4444','#4488ff','#ffaa00'][Math.floor((lx + ly) * 0.1) % 4] : '#333';
+                        ctx.fillStyle = lColor;
+                        ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2); ctx.fill();
+                        if (blink) {
+                            ctx.fillStyle = lColor.replace(')', ',0.3)').replace('rgb', 'rgba');
+                            ctx.beginPath(); ctx.arc(lx, ly, 6, 0, Math.PI * 2); ctx.fill();
+                        }
+                    }
+                }
+                break;
+            case 'space_screen':
+                // Monitor/screen
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, el.w, el.h, '#1a2a3a', '#0a1a2a', 2);
+                // Screen glow
+                {
+                    const scanline = (Date.now() * 0.05 + px) % el.h;
+                    ctx.fillStyle = 'rgba(0,180,255,0.15)';
+                    ctx.fillRect(px + 3, WALK_MIN_Y - el.h + 3, el.w - 6, el.h - 6);
+                    // Scrolling data lines
+                    ctx.fillStyle = 'rgba(0,255,180,0.5)';
+                    for (let sy = 0; sy < el.h - 10; sy += 6) {
+                        const lineW = ((px * 7 + sy * 13) % 30) + 8;
+                        ctx.fillRect(px + 6, WALK_MIN_Y - el.h + 6 + sy, Math.min(lineW, el.w - 14), 2);
+                    }
+                    // Scan line
+                    ctx.fillStyle = 'rgba(0,255,255,0.2)';
+                    ctx.fillRect(px + 3, WALK_MIN_Y - el.h + 3 + scanline, el.w - 6, 2);
+                }
+                // Frame
+                ctx.strokeStyle = '#4a6a8a'; ctx.lineWidth = 2;
+                ctx.strokeRect(px, WALK_MIN_Y - el.h, el.w, el.h);
+                break;
+            case 'space_tube':
+                // Glowing energy tube
+                drawGradRect(ctx, px, WALK_MIN_Y - el.h, 16, el.h, '#3a4a5a', '#2a3a4a', 2);
+                // Glass tube with energy
+                {
+                    const energyPulse = 0.5 + Math.sin(Date.now() * 0.004 + px * 0.1) * 0.5;
+                    const eg = ctx.createLinearGradient(px + 3, WALK_MIN_Y - el.h, px + 3, WALK_MIN_Y);
+                    eg.addColorStop(0, `rgba(0,255,200,${0.1 + energyPulse * 0.3})`);
+                    eg.addColorStop(0.5, `rgba(0,200,255,${0.2 + energyPulse * 0.4})`);
+                    eg.addColorStop(1, `rgba(0,255,200,${0.1 + energyPulse * 0.3})`);
+                    ctx.fillStyle = eg;
+                    ctx.fillRect(px + 3, WALK_MIN_Y - el.h + 5, 10, el.h - 10);
+                    // Glow
+                    const tg = ctx.createRadialGradient(px + 8, WALK_MIN_Y - el.h / 2, 0, px + 8, WALK_MIN_Y - el.h / 2, 25);
+                    tg.addColorStop(0, `rgba(0,255,220,${0.15 * energyPulse})`);
+                    tg.addColorStop(1, 'rgba(0,255,220,0)');
+                    ctx.fillStyle = tg;
+                    ctx.fillRect(px - 17, WALK_MIN_Y - el.h, 50, el.h);
+                }
+                // Caps
+                ctx.fillStyle = '#5a6a7a';
+                ctx.fillRect(px - 1, WALK_MIN_Y - el.h, 18, 6);
+                ctx.fillRect(px - 1, WALK_MIN_Y - 6, 18, 6);
                 break;
             case 'cloud':
                 const cg = ctx.createRadialGradient(px, el.y, 0, px, el.y, el.size);
@@ -1545,11 +1841,14 @@ function checkPlayerAttack(atk) {
             // Haptic
             if (navigator.vibrate) navigator.vibrate(15);
 
-            // Impact effect
-            impactEffects.push({ x: e.x, y: e.y - e.h/2, size: 25 + effectiveDamage * 0.5, life: 0.15, maxLife: 0.15, color: player.weapon ? '#44ffff' : '#ffff00' });
+            // Impact effect (bigger, longer)
+            impactEffects.push({ x: e.x, y: e.y - e.h/2, size: 32 + effectiveDamage * 0.7, life: 0.22, maxLife: 0.22, color: player.weapon ? '#44ffff' : '#ffff00' });
+
+            // Small screen shake on every hit
+            triggerShake(3 + effectiveDamage * 0.1, 0.08);
 
             // Screen flash on combo finisher
-            if (player.comboStep === 3) screenFlashAlpha = 0.2;
+            if (player.comboStep === 3) { screenFlashAlpha = 0.35; triggerShake(12, 0.18); }
         }
     }
 }
@@ -1557,7 +1856,7 @@ function checkPlayerAttack(atk) {
 function applyDamage(entity, damage, knockbackX) {
     entity.hp -= damage;
     entity.vx = knockbackX;
-    entity.flashTimer = 0.1;
+    entity.flashTimer = 0.18;
     entity.invincible = 0.15;
 
     if (entity.hp <= 0) {
@@ -1567,7 +1866,7 @@ function applyDamage(entity, damage, knockbackX) {
         emitParticles(entity.x, entity.y - entity.h/2, 'explosion', 1);
         score += entity.score || 100;
         playSound('kick');
-        triggerShake(6, 0.15);
+        triggerShake(10, 0.22);
 
         // Drop pickup (health, food, power-ups)
         if (Math.random() < 0.3 && !entity.bossType) {
@@ -1797,14 +2096,14 @@ function damagePlayer(damage, fromFacing) {
     if (player.invincible > 0 || player.state === 'dead') return;
 
     player.hp -= damage;
-    player.flashTimer = 0.1;
+    player.flashTimer = 0.18;
     player.invincible = INVINCIBLE_TIME;
     player.state = 'hurt';
     player.stateTimer = 0.3;
     player.vx = -fromFacing * 150;
 
     emitParticles(player.x, player.y - player.h/2, 'hit', -fromFacing);
-    triggerShake(5, 0.15);
+    triggerShake(8, 0.2);
     playSound('hurt');
 
     comboCount = 0;
@@ -1927,6 +2226,9 @@ function updateAmbientParticles(dt) {
         else if (type === 'city') { color = '#aaa'; vy2 = rnd(-5,5); vx2 = rnd(-10,10); life2 = 5; }
         else if (type === 'rooftop') { color = '#ff8844'; vy2 = rnd(-40,-10); vx2 = rnd(-5,5); life2 = 3; }
         else if (type === 'factory') { color = '#ffcc00'; vy2 = rnd(-30,-10); vx2 = rnd(-15,15); life2 = 2; }
+        else if (type === 'islamabad') { color = '#88aa44'; vy2 = rnd(-10,10); vx2 = rnd(-15,15); life2 = 4; }
+        else if (type === 'castle') { color = '#8855aa'; vy2 = rnd(-20,-5); vx2 = rnd(-8,8); life2 = 3; }
+        else if (type === 'space') { color = '#44ddff'; vy2 = rnd(-15,15); vx2 = rnd(-20,20); life2 = 2.5; }
         else { color = '#888'; vy2 = rnd(10,25); vx2 = rnd(-10,10); life2 = 4; }
         ambientParticles.push({
             x: camera.x + rnd(0, W), y: rnd(WALK_MIN_Y - 50, WALK_MIN_Y + 100),
