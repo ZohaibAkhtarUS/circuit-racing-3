@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Circuit Racing 3</title>
-    <link rel="stylesheet" href="css/style.css?v=5">
+    <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
     <div id="game-container">
@@ -86,16 +86,12 @@
 
             <!-- Mobile Touch Controls -->
             <div id="mobile-controls">
-                <div id="joystick-zone">
-                    <div id="joystick-base">
-                        <div id="joystick-thumb"></div>
-                    </div>
-                </div>
-                <div id="mobile-buttons">
-                    <button class="mobile-action-btn" id="btn-drift">DRIFT</button>
-                    <button class="mobile-action-btn" id="btn-nitro">&#x1F680;</button>
-                    <button class="mobile-action-btn" id="btn-item">&#x26A1;</button>
-                </div>
+                <div id="steer-left" class="steer-btn">&#9664;</div>
+                <div id="steer-right" class="steer-btn">&#9654;</div>
+                <div id="brake-btn" class="mobile-action-btn">BRAKE</div>
+                <button class="mobile-action-btn" id="btn-nitro">🚀</button>
+                <button class="mobile-action-btn" id="btn-item">⚡</button>
+                <div id="tilt-indicator">📱 TILT TO STEER</div>
             </div>
         </div>
 
@@ -125,6 +121,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/game3d.js?v=5"></script>
+    <script src="js/game3d.js?v=6"></script>
 </body>
 </html>

@@ -713,63 +713,69 @@ body.is-mobile #mobile-controls {
     display: block;
 }
 
-/* Joystick */
-#joystick-zone {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    width: 160px;
-    height: 160px;
-    pointer-events: auto;
-    touch-action: none;
-}
-
-#joystick-base {
+/* Big left/right steering buttons - cover bottom half of screen sides */
+.steer-btn {
     position: absolute;
     bottom: 0;
-    left: 0;
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    border: 3px solid rgba(255, 255, 255, 0.25);
+    width: 35%;
+    height: 45%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-#joystick-thumb {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: rgba(255, 107, 53, 0.7);
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    font-size: 60px;
+    color: rgba(255, 255, 255, 0.35);
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
     transition: background 0.1s;
 }
 
-/* Action buttons */
-#mobile-buttons {
-    position: absolute;
-    bottom: 24px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    pointer-events: auto;
-    touch-action: none;
+#steer-left {
+    left: 0;
+    border-radius: 0 20px 0 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, transparent 100%);
 }
 
+#steer-right {
+    right: 0;
+    border-radius: 20px 0 0 0;
+    background: linear-gradient(-90deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+}
+
+.steer-btn:active, .steer-btn.pressed {
+    background: rgba(255, 107, 53, 0.25) !important;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Brake button - bottom center */
+#brake-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(231, 76, 60, 0.5);
+    border: 2px solid rgba(231, 76, 60, 0.6);
+    color: #fff;
+    font-size: 13px;
+    font-family: 'Arial Black', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Action buttons - right side stacked */
 .mobile-action-btn {
-    width: 68px;
-    height: 68px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.3);
     color: #fff;
-    font-size: 14px;
     font-family: 'Arial Black', 'Impact', sans-serif;
     display: flex;
     align-items: center;
@@ -781,152 +787,212 @@ body.is-mobile #mobile-controls {
     transition: opacity 0.1s, transform 0.1s;
 }
 
-#btn-drift {
-    background: rgba(255, 107, 53, 0.55);
-    font-size: 13px;
-}
-
 #btn-nitro {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-30px);
+    width: 72px;
+    height: 72px;
     background: rgba(0, 170, 255, 0.55);
-    font-size: 26px;
+    font-size: 30px;
+    pointer-events: auto;
 }
 
 #btn-item {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(55px);
+    width: 64px;
+    height: 64px;
     background: rgba(255, 200, 0, 0.55);
-    font-size: 26px;
+    font-size: 28px;
+    pointer-events: auto;
 }
 
 .mobile-action-btn:active,
 .mobile-action-btn.pressed {
     opacity: 1;
-    transform: scale(0.9);
-    border-color: rgba(255, 255, 255, 0.7);
+    transform: scale(0.88);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+#btn-nitro:active, #btn-nitro.pressed {
+    transform: translateY(-30px) scale(0.88);
+}
+
+#btn-item:active, #btn-item.pressed {
+    transform: translateY(55px) scale(0.88);
+}
+
+/* Tilt indicator */
+#tilt-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Arial', sans-serif;
+    pointer-events: none;
+    display: none;
+    animation: tiltFade 3s ease-out forwards;
+}
+
+@keyframes tiltFade {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; display: none; }
 }
 
 /* === Mobile HUD adjustments === */
 
 body.is-mobile .controls-help,
-body.is-mobile #hud kbd {
+body.is-mobile #hud kbd,
+body.is-mobile #item-use-hint,
+body.is-mobile #tutorial-btn {
     display: none !important;
 }
 
-body.is-mobile #item-use-hint {
-    display: none !important;
-}
-
+/* Hide minimap on mobile - too small to be useful */
 body.is-mobile #minimap {
-    width: 100px;
-    height: 100px;
-    margin-top: 30px;
+    display: none;
 }
 
-body.is-mobile #minimap canvas {
-    width: 100px;
-    height: 100px;
-}
-
+/* Compact position panel */
 body.is-mobile #position-panel {
-    top: 10px;
-    left: 10px;
-    padding: 6px 12px;
+    top: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    border-radius: 8px;
 }
+body.is-mobile #position-value { font-size: 28px; }
+body.is-mobile #position-suffix { font-size: 12px; }
 
-body.is-mobile #position-value {
-    font-size: 28px;
-}
-
-body.is-mobile #position-suffix {
-    font-size: 12px;
-}
-
+/* Speed - top center, compact */
 body.is-mobile #speed-panel {
     bottom: auto;
-    top: 10px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 6px 14px;
+    padding: 4px 12px;
+    border-radius: 8px;
 }
+body.is-mobile #speed-value { font-size: 28px; }
+body.is-mobile #speed-bar-container { width: 80px; }
 
-body.is-mobile #speed-value {
-    font-size: 30px;
-}
-
-body.is-mobile #speed-bar-container {
-    width: 100px;
-}
-
+/* Nitro bar - below speed */
 body.is-mobile #nitro-panel {
     bottom: auto;
-    top: 60px;
+    top: 52px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 4px 10px;
+    padding: 3px 10px;
 }
+body.is-mobile #nitro-bar-container { width: 70px; }
+body.is-mobile #nitro-label { font-size: 9px; }
 
-body.is-mobile #nitro-bar-container {
-    width: 90px;
-}
-
+/* Lap - top right */
 body.is-mobile #lap-panel {
     bottom: auto;
-    top: 10px;
+    top: 8px;
     left: auto;
-    right: 10px;
-    padding: 6px 12px;
-    margin-right: 0;
+    right: 8px;
+    padding: 4px 10px;
+    border-radius: 8px;
 }
+body.is-mobile #lap-text { font-size: 12px; }
+body.is-mobile #lap-time { font-size: 10px; }
 
-body.is-mobile #lap-text {
-    font-size: 13px;
-}
-
-body.is-mobile #lap-time {
-    font-size: 11px;
-}
-
+/* Item panel - hidden, auto-use items on mobile */
 body.is-mobile #item-panel {
-    bottom: auto;
-    top: 90px;
-    right: 10px;
-    padding: 6px 12px;
-    min-width: 50px;
+    display: none;
 }
 
-body.is-mobile #item-icon {
-    font-size: 22px;
-}
-
+/* Camera info - hidden on mobile */
 body.is-mobile #camera-info {
-    top: auto;
-    bottom: 200px;
-    right: 10px;
-    padding: 6px 10px;
-    font-size: 11px;
+    display: none;
 }
 
 body.is-mobile #countdown {
-    font-size: 70px;
+    font-size: 60px;
+}
+
+/* Position change popup */
+body.is-mobile #position-change {
+    font-size: 22px;
+    top: 50px;
+    left: 15px;
+}
+
+/* === Mobile Menu adjustments === */
+body.is-mobile #menu-overlay {
+    padding: 15px 10px 30px;
 }
 
 body.is-mobile #menu-overlay h1 {
-    font-size: 36px;
+    font-size: 32px;
+    margin-bottom: 2px;
 }
 
 body.is-mobile #menu-overlay .subtitle {
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+body.is-mobile .menu-section-title {
     font-size: 11px;
     letter-spacing: 4px;
+    margin: 12px 0 6px;
 }
 
 body.is-mobile .mode-btn {
-    width: 260px;
+    width: 85%;
+    max-width: 280px;
     padding: 10px 14px;
+    margin: 3px 0;
+}
+body.is-mobile .mode-btn .mode-name { font-size: 14px; }
+body.is-mobile .mode-btn .mode-desc { font-size: 10px; }
+
+body.is-mobile .track-selection {
+    gap: 6px;
+}
+body.is-mobile .track-option {
+    padding: 8px 12px;
+    font-size: 11px;
 }
 
-body.is-mobile .mode-btn .mode-name {
-    font-size: 15px;
+body.is-mobile .car-selection {
+    gap: 6px;
+}
+body.is-mobile .car-option {
+    width: 58px;
+    height: 48px;
+}
+body.is-mobile .car-option .car-preview {
+    width: 32px;
+    height: 18px;
+}
+body.is-mobile .car-option .car-name {
+    font-size: 7px;
 }
 
 body.is-mobile #start-btn {
-    padding: 10px 36px;
+    padding: 10px 40px;
     font-size: 18px;
+    margin-top: 12px;
 }
+
+/* Results on mobile */
+body.is-mobile .result-row {
+    min-width: auto;
+    gap: 10px;
+    padding: 8px 12px;
+}
+body.is-mobile .result-pos { font-size: 24px; width: 40px; }
+body.is-mobile .result-name { font-size: 13px; }
+body.is-mobile .result-time { font-size: 12px; }
+body.is-mobile #result-overlay h1 { font-size: 36px; }

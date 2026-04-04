@@ -61,6 +61,8 @@ let raceStartTime = 0;
 let keys = {};
 let mobileInput = { up: false, down: false, left: false, right: false, drift: false, nitro: false, useItem: false };
 let isMobile = false;
+let tiltSteering = 0; // -1 to 1 from device orientation
+let hasTilt = false;
 let trackWalls = [];
 let tutorialActive = false, tutorialStep = 0;
 let minimapCtx = null;
@@ -767,6 +769,9 @@ function initParticleSystem() {
 }
 
 function emitParticle(x, y, z, type) {
+    // Skip most particles on mobile for performance
+    if (isMobile && type !== 'boost' && Math.random() > 0.3) return;
+
     let r, g, b, life, vy, sz;
     if (type === 'smoke') { r = 0.8; g = 0.8; b = 0.8; life = 0.6; vy = 2; sz = 1.2; }
     else if (type === 'dust') { r = 0.55; g = 0.45; b = 0.33; life = 0.8; vy = 1; sz = 0.9; }
@@ -775,7 +780,8 @@ function emitParticle(x, y, z, type) {
     else if (type === 'boost') { r = 0.2; g = 0.5; b = 1; life = 0.4; vy = 1.5; sz = 0.8; }
     else return;
 
-    if (particleData.length >= MAX_PARTICLES) particleData.shift();
+    const maxP = isMobile ? 200 : MAX_PARTICLES;
+    if (particleData.length >= maxP) particleData.shift();
     particleData.push({
         x: x + (Math.random() - 0.5) * 0.5, y: y + 0.3, z: z + (Math.random() - 0.5) * 0.5,
         vx: (Math.random() - 0.5) * 2, vy, vz: (Math.random() - 0.5) * 2,
@@ -1132,11 +1138,13 @@ function updateCamera(dt) {
     camera.updateProjectionMatrix();
 
     if (cameraMode === 0) {
-        const dist = 14, height = 7;
+        const dist = isMobile ? 18 : 14, height = isMobile ? 11 : 7;
+        const lookAhead = isMobile ? 12 : 6;
+        const smoothing = isMobile ? 0.06 : 0.08;
         const cx = p.x - Math.sin(p.angle) * dist;
         const cz = p.z - Math.cos(p.angle) * dist;
-        camera.position.lerp(new THREE.Vector3(cx, p.mesh.position.y + height, cz), 0.08);
-        camera.lookAt(new THREE.Vector3(p.x + Math.sin(p.angle) * 6, p.mesh.position.y + 1, p.z + Math.cos(p.angle) * 6));
+        camera.position.lerp(new THREE.Vector3(cx, p.mesh.position.y + height, cz), smoothing);
+        camera.lookAt(new THREE.Vector3(p.x + Math.sin(p.angle) * lookAhead, p.mesh.position.y + 1, p.z + Math.cos(p.angle) * lookAhead));
     } else if (cameraMode === 1) {
         camera.position.set(p.x + Math.sin(p.angle) * 0.5, p.mesh.position.y + 1.8, p.z + Math.cos(p.angle) * 0.5);
         camera.lookAt(p.x + Math.sin(p.angle) * 20, p.mesh.position.y + 1, p.z + Math.cos(p.angle) * 20);
@@ -1479,122 +1487,146 @@ function setupMobileControls() {
 
     document.body.classList.add('is-mobile');
 
-    const joystickZone = document.getElementById('joystick-zone');
-    const joystickBase = document.getElementById('joystick-base');
-    const joystickThumb = document.getElementById('joystick-thumb');
-    const baseRadius = 65; // half of 130px base
-    const maxDist = baseRadius - 10;
-    let joystickTouchId = null;
+    // Mobile auto-accelerates — no need to hold gas!
+    mobileInput.up = true;
 
-    function updateJoystick(touchX, touchY) {
-        const rect = joystickBase.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        let dx = touchX - centerX;
-        let dy = touchY - centerY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        // Clamp to base circle
-        if (dist > maxDist) {
-            dx = (dx / dist) * maxDist;
-            dy = (dy / dist) * maxDist;
+    // --- TILT STEERING (gyroscope) ---
+    function handleOrientation(e) {
+        if (e.gamma !== null) {
+            hasTilt = true;
+            // gamma: -90 to 90 degrees (left/right tilt)
+            // Normalize to -1..1 with dead zone
+            let tilt = e.gamma / 30; // 30 degrees = full turn
+            tilt = Math.max(-1, Math.min(1, tilt));
+            // Dead zone
+            if (Math.abs(tilt) < 0.08) tilt = 0;
+            tiltSteering = tilt;
+            mobileInput.left = tilt < -0.15;
+            mobileInput.right = tilt > 0.15;
+            // Auto-drift on sharp tilt
+            mobileInput.drift = Math.abs(tilt) > 0.6;
         }
-
-        // Move thumb visually
-        joystickThumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-
-        // Normalize to -1..1
-        const nx = dx / maxDist;
-        const ny = dy / maxDist;
-
-        // Map to input with dead zone
-        mobileInput.left = nx < -0.3;
-        mobileInput.right = nx > 0.3;
-        mobileInput.up = ny < -0.3;
-        mobileInput.down = ny > 0.3;
     }
 
-    function resetJoystick() {
-        joystickThumb.style.transform = 'translate(-50%, -50%)';
-        mobileInput.left = false;
-        mobileInput.right = false;
-        mobileInput.up = false;
-        mobileInput.down = false;
-        joystickTouchId = null;
+    // Request permission for tilt (iOS requires this)
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS 13+ — will request on first touch
+        document.addEventListener('touchstart', function requestTilt() {
+            DeviceOrientationEvent.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+            }).catch(function() {});
+            document.removeEventListener('touchstart', requestTilt);
+        }, { once: true });
+    } else {
+        window.addEventListener('deviceorientation', handleOrientation);
     }
 
-    joystickZone.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        const touch = e.changedTouches[0];
-        joystickTouchId = touch.identifier;
-        updateJoystick(touch.clientX, touch.clientY);
-    }, { passive: false });
+    // --- TAP STEERING (fallback + supplement to tilt) ---
+    const steerLeft = document.getElementById('steer-left');
+    const steerRight = document.getElementById('steer-right');
 
-    joystickZone.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === joystickTouchId) {
-                updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
-                break;
-            }
-        }
-    }, { passive: false });
-
-    joystickZone.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === joystickTouchId) {
-                resetJoystick();
-                break;
-            }
-        }
-    }, { passive: false });
-
-    joystickZone.addEventListener('touchcancel', function(e) {
-        e.preventDefault();
-        resetJoystick();
-    }, { passive: false });
-
-    // --- Action buttons ---
-    function setupButton(id, inputKey, isToggle) {
-        const btn = document.getElementById(id);
+    function setupSteerBtn(btn, dir) {
         btn.addEventListener('touchstart', function(e) {
             e.preventDefault();
             btn.classList.add('pressed');
-            if (isToggle) {
-                mobileInput[inputKey] = true;
-                setTimeout(() => { mobileInput[inputKey] = false; }, 100);
-            } else {
-                mobileInput[inputKey] = true;
-            }
+            mobileInput[dir] = true;
         }, { passive: false });
         btn.addEventListener('touchend', function(e) {
             e.preventDefault();
             btn.classList.remove('pressed');
-            if (!isToggle) {
-                mobileInput[inputKey] = false;
-            }
+            mobileInput[dir] = false;
         }, { passive: false });
         btn.addEventListener('touchcancel', function(e) {
             e.preventDefault();
             btn.classList.remove('pressed');
-            if (!isToggle) {
-                mobileInput[inputKey] = false;
-            }
+            mobileInput[dir] = false;
         }, { passive: false });
     }
+    setupSteerBtn(steerLeft, 'left');
+    setupSteerBtn(steerRight, 'right');
 
-    setupButton('btn-drift', 'drift', false);
-    setupButton('btn-nitro', 'nitro', true);
-    setupButton('btn-item', 'useItem', true);
-
-    // Camera switch on tap
-    const camInfo = document.getElementById('camera-info');
-    camInfo.addEventListener('touchstart', function(e) {
+    // --- BRAKE button ---
+    const brakeBtn = document.getElementById('brake-btn');
+    brakeBtn.addEventListener('touchstart', function(e) {
         e.preventDefault();
-        cameraMode = (cameraMode + 1) % cameraNames.length;
-        camInfo.innerHTML = cameraNames[cameraMode];
+        brakeBtn.classList.add('pressed');
+        mobileInput.down = true;
+        mobileInput.up = false; // Stop auto-gas while braking
     }, { passive: false });
+    brakeBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        brakeBtn.classList.remove('pressed');
+        mobileInput.down = false;
+        mobileInput.up = true; // Resume auto-gas
+    }, { passive: false });
+    brakeBtn.addEventListener('touchcancel', function(e) {
+        e.preventDefault();
+        brakeBtn.classList.remove('pressed');
+        mobileInput.down = false;
+        mobileInput.up = true;
+    }, { passive: false });
+
+    // --- Nitro & Item buttons ---
+    function setupActionBtn(id, inputKey) {
+        const btn = document.getElementById(id);
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            btn.classList.add('pressed');
+            mobileInput[inputKey] = true;
+            setTimeout(function() { mobileInput[inputKey] = false; }, 150);
+        }, { passive: false });
+        btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            btn.classList.remove('pressed');
+        }, { passive: false });
+        btn.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            btn.classList.remove('pressed');
+        }, { passive: false });
+    }
+    setupActionBtn('btn-nitro', 'nitro');
+    setupActionBtn('btn-item', 'useItem');
+
+    // --- AUTO-USE ITEMS on mobile (use items automatically after 2 seconds) ---
+    setInterval(function() {
+        if (gameState === 'racing' && playerCars[0] && playerCars[0].heldItem) {
+            mobileInput.useItem = true;
+            setTimeout(function() { mobileInput.useItem = false; }, 150);
+        }
+    }, 2000);
+
+    // Show tilt indicator briefly
+    const tiltInd = document.getElementById('tilt-indicator');
+    if (tiltInd) tiltInd.style.display = 'block';
+
+    // --- Prevent all zooming/scrolling on the game ---
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+    document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+
+    // --- MOBILE PERFORMANCE OPTIMIZATIONS ---
+    if (renderer) {
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        // Disable shadows on mobile — huge performance win
+        renderer.shadowMap.enabled = false;
+    }
+    if (scene && scene.fog) {
+        scene.fog.near = 50;
+        scene.fog.far = 160;
+    }
+
+    // Make physics more forgiving on mobile
+    PHYS.turnSpeed = 3.2;       // Faster turning
+    PHYS.friction = 0.992;      // Less friction = easier to keep speed
+    PHYS.offTrackMult = 0.97;   // Less penalty for going off
+    PHYS.wallSpeedLoss = 0.85;  // Less wall bounce penalty
+
+    // Force chase cam (best for mobile)
+    cameraMode = 0;
 }
 
 // --- INIT ---
@@ -1606,11 +1638,12 @@ function init() {
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
     camera.position.set(0, 30, 50);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    const earlyMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    renderer = new THREE.WebGLRenderer({ antialias: !earlyMobile, powerPreference: earlyMobile ? 'low-power' : 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, earlyMobile ? 1.5 : 2));
+    renderer.shadowMap.enabled = !earlyMobile;
+    if (!earlyMobile) renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.getElementById('game-container').insertBefore(renderer.domElement, document.getElementById('menu-overlay'));
 
     // Lighting
