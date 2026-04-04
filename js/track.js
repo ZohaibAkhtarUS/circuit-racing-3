@@ -282,41 +282,179 @@ function buildTrack() {
     banner.rotation.y = Math.atan2(sDir.x, sDir.z);
     scene.add(banner);
 
-    // Ramps
+    // Ramps — 5 spread around the track
     const ramps = [];
-    const rampIndices = [Math.floor(wp.length * 0.25), Math.floor(wp.length * 0.6)];
-    rampIndices.forEach(ri => {
+    const rampIndices = [0.12, 0.3, 0.5, 0.7, 0.88].map(f => Math.floor(f * wp.length));
+    const rampColors = [0xffaa33, 0x33aaff, 0xff33aa, 0x33ffaa, 0xffff33];
+    rampIndices.forEach((ri, idx) => {
         const rp = wp[ri], rn = wp[(ri + 1) % wp.length];
         const rd = new THREE.Vector3().subVectors(rn, rp).normalize();
         const angle = Math.atan2(rd.x, rd.z);
-        const rampGeo = new THREE.BoxGeometry(roadW * 0.4, 0.8, 6);
-        const ramp = new THREE.Mesh(rampGeo, new THREE.MeshStandardMaterial({ color: 0xffaa33, roughness: 0.4, metalness: 0.3 }));
-        ramp.position.set(rp.x, rp.y + 0.4, rp.z);
+        // Wedge-shaped ramp (tilted so cars actually launch)
+        const rampGeo = new THREE.BoxGeometry(roadW * 0.45, 1.2, 8);
+        const rampMat = new THREE.MeshStandardMaterial({ color: rampColors[idx], roughness: 0.3, metalness: 0.4 });
+        const ramp = new THREE.Mesh(rampGeo, rampMat);
+        ramp.position.set(rp.x, rp.y + 0.6, rp.z);
         ramp.rotation.y = angle;
         ramp.castShadow = currentGfx.shadows;
         scene.add(ramp);
-        // Arrow on ramp
-        const arrow = new THREE.Mesh(new THREE.ConeGeometry(1, 2, 3), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 }));
-        arrow.position.set(rp.x, rp.y + 1.2, rp.z);
-        arrow.rotation.x = -Math.PI / 2;
-        arrow.rotation.z = -angle;
-        scene.add(arrow);
-        ramps.push({ pos: rp.clone(), radius: 8 });
+        // Chevron arrows on ramp
+        for (let a = 0; a < 3; a++) {
+            const arrow = new THREE.Mesh(
+                new THREE.ConeGeometry(0.8, 1.5, 3),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 + a * 0.15 })
+            );
+            const offset = (a - 1) * 2.5;
+            arrow.position.set(
+                rp.x + rd.x * offset,
+                rp.y + 1.5,
+                rp.z + rd.z * offset
+            );
+            arrow.rotation.x = -Math.PI / 2;
+            arrow.rotation.z = -angle;
+            scene.add(arrow);
+        }
+        // Side glow poles
+        const rNorm = new THREE.Vector3(-rd.z, 0, rd.x);
+        for (const side of [-1, 1]) {
+            const pole = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.15, 0.15, 3, 6),
+                new THREE.MeshBasicMaterial({ color: rampColors[idx] })
+            );
+            pole.position.set(
+                rp.x + rNorm.x * side * (roadW * 0.25),
+                rp.y + 1.5,
+                rp.z + rNorm.z * side * (roadW * 0.25)
+            );
+            scene.add(pole);
+        }
+        ramps.push({ pos: rp.clone(), radius: 9 });
     });
 
-    // Moving obstacles
+    // Static obstacles — cones, barrels, and barriers placed on track
+    staticObstacles = [];
+    const obstaclePositions = [0.08, 0.18, 0.28, 0.38, 0.48, 0.58, 0.68, 0.78, 0.85, 0.93];
+    obstaclePositions.forEach((frac, idx) => {
+        const oi = Math.floor(frac * wp.length);
+        const op = wp[oi], on = wp[(oi + 1) % wp.length];
+        const od = new THREE.Vector3().subVectors(on, op).normalize();
+        const oNorm = new THREE.Vector3(-od.z, 0, od.x);
+        // Place obstacle offset from center (left or right side)
+        const side = (idx % 2 === 0) ? 1 : -1;
+        const lateralOffset = (roadW * 0.15) + Math.random() * (roadW * 0.2);
+        const ox = op.x + oNorm.x * side * lateralOffset;
+        const oz = op.z + oNorm.z * side * lateralOffset;
+        const oy = op.y;
+
+        const obstType = idx % 3;
+        let obsMesh;
+        if (obstType === 0) {
+            // Traffic cone cluster (2-3 cones)
+            const group = new THREE.Group();
+            for (let c = 0; c < 2 + Math.floor(Math.random() * 2); c++) {
+                const cone = new THREE.Mesh(
+                    new THREE.ConeGeometry(0.4, 1.2, 8),
+                    new THREE.MeshStandardMaterial({ color: 0xff6600, roughness: 0.5 })
+                );
+                cone.position.set((Math.random() - 0.5) * 1.5, 0.6, (Math.random() - 0.5) * 1.5);
+                group.add(cone);
+                // White stripe on cone
+                const stripe = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.32, 0.36, 0.15, 8),
+                    new THREE.MeshBasicMaterial({ color: 0xffffff })
+                );
+                stripe.position.copy(cone.position);
+                stripe.position.y = 0.75;
+                group.add(stripe);
+            }
+            group.position.set(ox, oy, oz);
+            obsMesh = group;
+        } else if (obstType === 1) {
+            // Barrel stack
+            const group = new THREE.Group();
+            const barrelGeo = new THREE.CylinderGeometry(0.6, 0.6, 1.2, 10);
+            const barrelColors = [0xff4444, 0x4444ff, 0xffaa00];
+            for (let b = 0; b < 2; b++) {
+                const barrel = new THREE.Mesh(
+                    barrelGeo,
+                    new THREE.MeshStandardMaterial({ color: barrelColors[b % 3], roughness: 0.6, metalness: 0.2 })
+                );
+                barrel.position.set(b * 1.2 - 0.6, 0.6, 0);
+                group.add(barrel);
+                // Metal band
+                const band = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.6, 0.05, 6, 12),
+                    new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.7 })
+                );
+                band.position.copy(barrel.position);
+                band.position.y = 0.3;
+                band.rotation.x = Math.PI / 2;
+                group.add(band);
+            }
+            group.position.set(ox, oy, oz);
+            obsMesh = group;
+        } else {
+            // Road barrier (striped)
+            const group = new THREE.Group();
+            const barrier = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 1, 0.6),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 })
+            );
+            barrier.position.y = 0.5;
+            group.add(barrier);
+            // Red stripes
+            for (let s = 0; s < 3; s++) {
+                const stripe = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.8, 0.9, 0.65),
+                    new THREE.MeshStandardMaterial({ color: 0xff2222, roughness: 0.5 })
+                );
+                stripe.position.set(-1 + s * 1, 0.5, 0);
+                group.add(stripe);
+            }
+            group.position.set(ox, oy, oz);
+            group.rotation.y = Math.atan2(od.x, od.z) + (Math.random() - 0.5) * 0.3;
+            obsMesh = group;
+        }
+
+        obsMesh.castShadow = currentGfx.shadows;
+        scene.add(obsMesh);
+        staticObstacles.push({ mesh: obsMesh, x: ox, z: oz, radius: 2.2 });
+    });
+
+    // Moving obstacles — 3 sweeping barriers across the track
     movingObstacles = [];
-    const obsIdx = Math.floor(wp.length * 0.45);
-    const op = wp[obsIdx], on = wp[(obsIdx + 1) % wp.length];
-    const od = new THREE.Vector3().subVectors(on, op).normalize();
-    const oNorm = new THREE.Vector3(-od.z, 0, od.x);
-    const obsGeo = new THREE.BoxGeometry(2, 2, 2);
-    const obsMat = new THREE.MeshStandardMaterial({ color: 0xff4444, emissive: 0xff2222, emissiveIntensity: 0.15, roughness: 0.3 });
-    const obs = new THREE.Mesh(obsGeo, obsMat);
-    obs.position.set(op.x, op.y + 1, op.z);
-    obs.castShadow = currentGfx.shadows;
-    scene.add(obs);
-    movingObstacles.push({ mesh: obs, center: op.clone(), norm: oNorm.clone(), range: roadW * 0.35, speed: 0.8, time: 0 });
+    const movObsPositions = [0.2, 0.45, 0.75];
+    movObsPositions.forEach((frac, idx) => {
+        const obsIdx = Math.floor(frac * wp.length);
+        const op = wp[obsIdx], on = wp[(obsIdx + 1) % wp.length];
+        const od = new THREE.Vector3().subVectors(on, op).normalize();
+        const oNorm = new THREE.Vector3(-od.z, 0, od.x);
+        const obsColors = [0xff4444, 0x44ff44, 0x4444ff];
+        const obsGeo = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+        const obsMat = new THREE.MeshStandardMaterial({
+            color: obsColors[idx], emissive: obsColors[idx], emissiveIntensity: 0.15, roughness: 0.3
+        });
+        const obs = new THREE.Mesh(obsGeo, obsMat);
+        obs.position.set(op.x, op.y + 1.25, op.z);
+        obs.castShadow = currentGfx.shadows;
+        scene.add(obs);
+        // Warning sign above
+        const warningCanvas = document.createElement('canvas');
+        warningCanvas.width = 64; warningCanvas.height = 64;
+        const wctx = warningCanvas.getContext('2d');
+        wctx.fillStyle = '#ffcc00';
+        wctx.beginPath(); wctx.moveTo(32, 4); wctx.lineTo(60, 56); wctx.lineTo(4, 56); wctx.closePath(); wctx.fill();
+        wctx.fillStyle = '#000000'; wctx.font = 'bold 32px Arial'; wctx.textAlign = 'center'; wctx.fillText('!', 32, 48);
+        const warningTex = new THREE.CanvasTexture(warningCanvas);
+        const warning = new THREE.Sprite(new THREE.SpriteMaterial({ map: warningTex, transparent: true }));
+        warning.scale.set(2, 2, 1);
+        warning.position.set(0, 2.5, 0);
+        obs.add(warning);
+        movingObstacles.push({
+            mesh: obs, center: op.clone(), norm: oNorm.clone(),
+            range: roadW * 0.38, speed: 0.6 + idx * 0.3, time: idx * 2
+        });
+    });
 
     // Decorations
     addDecorations(wp, roadW);

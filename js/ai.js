@@ -42,6 +42,49 @@ class AICar extends GameCar {
             }
         }
 
+        // Obstacle avoidance — steer away from nearby obstacles
+        const avoidDist = 12 + this.speed * 0.08;
+        let avoidX = 0, avoidZ = 0;
+        for (const obs of staticObstacles) {
+            const odx = this.x - obs.x, odz = this.z - obs.z;
+            const oDist = Math.sqrt(odx * odx + odz * odz);
+            if (oDist < avoidDist && oDist > 0.1) {
+                // Check if obstacle is ahead of us
+                const toObs = Math.atan2(obs.x - this.x, obs.z - this.z);
+                let relAngle = toObs - this.angle;
+                while (relAngle > Math.PI) relAngle -= Math.PI * 2;
+                while (relAngle < -Math.PI) relAngle += Math.PI * 2;
+                if (Math.abs(relAngle) < 1.0) {
+                    const strength = 1 - (oDist / avoidDist);
+                    avoidX += (odx / oDist) * strength;
+                    avoidZ += (odz / oDist) * strength;
+                }
+            }
+        }
+        for (const obs of movingObstacles) {
+            const odx = this.x - obs.mesh.position.x, odz = this.z - obs.mesh.position.z;
+            const oDist = Math.sqrt(odx * odx + odz * odz);
+            if (oDist < avoidDist && oDist > 0.1) {
+                const toObs = Math.atan2(obs.mesh.position.x - this.x, obs.mesh.position.z - this.z);
+                let relAngle = toObs - this.angle;
+                while (relAngle > Math.PI) relAngle -= Math.PI * 2;
+                while (relAngle < -Math.PI) relAngle += Math.PI * 2;
+                if (Math.abs(relAngle) < 1.0) {
+                    const strength = 1 - (oDist / avoidDist);
+                    avoidX += (odx / oDist) * strength * 1.5;
+                    avoidZ += (odz / oDist) * strength * 1.5;
+                }
+            }
+        }
+        if (avoidX !== 0 || avoidZ !== 0) {
+            const avoidAngle = Math.atan2(avoidX, avoidZ);
+            let avoidDiff = avoidAngle - this.angle;
+            while (avoidDiff > Math.PI) avoidDiff -= Math.PI * 2;
+            while (avoidDiff < -Math.PI) avoidDiff += Math.PI * 2;
+            if (avoidDiff > 0.05) { input.left = true; input.right = false; }
+            else if (avoidDiff < -0.05) { input.right = true; input.left = false; }
+        }
+
         // Rubber banding for kid mode
         if (selectedDifficulty === 'kid') {
             const sorted = [...allCars].sort((a, b) => b.raceProgress - a.raceProgress);

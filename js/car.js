@@ -531,6 +531,22 @@ class GameCar {
         }
         this.x = newX; this.z = newZ;
 
+        // Static obstacle collision
+        for (const obs of staticObstacles) {
+            const dx = this.x - obs.x, dz = this.z - obs.z;
+            const dist = Math.sqrt(dx * dx + dz * dz);
+            if (dist < obs.radius + 1.2) {
+                const push = obs.radius + 1.2 - dist;
+                if (dist > 0.01) {
+                    this.x += (dx / dist) * push;
+                    this.z += (dz / dist) * push;
+                }
+                if (!this.starActive) this.speed *= 0.5;
+                playCollision();
+                for (let j = 0; j < 3; j++) emitParticle(this.x, this.mesh.position.y + 0.5, this.z, 'spark');
+            }
+        }
+
         // Hard track clamp
         if (track) {
             let minD = Infinity, closestIdx = 0;

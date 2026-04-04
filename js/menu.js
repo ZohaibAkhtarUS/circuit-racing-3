@@ -55,7 +55,7 @@ function rebuildScene() {
         }
     });
     particleData = [];
-    itemBoxes = []; projectiles = []; hazards = []; movingObstacles = []; clouds = [];
+    itemBoxes = []; projectiles = []; hazards = []; movingObstacles = []; staticObstacles = []; clouds = [];
     driftScore = 0; driftCombo = 0; driftComboTimer = 0; driftPopups = [];
     celebrationActive = false;
     track = buildTrack();
@@ -254,7 +254,7 @@ const TUTORIAL_STEPS = [
     { title: 'Nitro Boost!', text: 'Press the rocket button for SUPER SPEED! 8 second cooldown.', keys: [{ key: 'E', label: 'Nitro' }], highlight: 'nitro-panel' },
     { title: 'Power-Ups!', text: 'Drive through rainbow boxes to get items! You get rockets, shields, bananas, stars and more!', keys: [{ key: 'F', label: 'Use Item' }], highlight: 'item-panel' },
     { title: 'Horn!', text: 'Press H to honk your horn! It\'s fun!', keys: [{ key: 'H', label: 'HONK!' }], highlight: null },
-    { title: 'Ready to Race!', text: 'Complete 3 laps to win! Can you get 1st place and earn 3 stars? GO GO GO!', keys: [], highlight: null, isFinal: true }
+    { title: 'Ready to Race!', text: 'Complete 10 laps to win! Dodge obstacles and hit ramps for big air! GO GO GO!', keys: [], highlight: null, isFinal: true }
 ];
 
 function startTutorial() { tutorialActive = true; tutorialStep = 0; document.getElementById('tutorial-overlay').style.display = 'flex'; showTutorialStep(); }

@@ -39,7 +39,7 @@ const AI_DIFF = {
     hard:   { speedMult: 0.95, accuracy: 0.93, wpThresh: 11 }
 };
 
-const RACE_LAPS = 3;
+const RACE_LAPS = 10;
 const TRACK_ROAD_W = 22;
 const ITEMS = { BOOST: 'boost', SHIELD: 'shield', MISSILE: 'missile', OIL: 'oil', BANANA: 'banana', STAR: 'star', LIGHTNING: 'lightning', MAGNET: 'magnet' };
 
@@ -104,6 +104,9 @@ let clouds = [];
 
 // Moving obstacles
 let movingObstacles = [];
+
+// Static obstacles (cones, barrels, barriers)
+let staticObstacles = [];
 
 // Drift scoring
 let driftScore = 0;
