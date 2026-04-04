@@ -35,9 +35,9 @@ const PHYS = {
 };
 
 const AI_DIFF = {
-    easy:   { speedMult: 0.75, accuracy: 0.65, wpThresh: 20 },
-    medium: { speedMult: 0.86, accuracy: 0.82, wpThresh: 15 },
-    hard:   { speedMult: 0.95, accuracy: 0.93, wpThresh: 11 }
+    easy:   { speedMult: 0.55, accuracy: 0.45, wpThresh: 28 },
+    medium: { speedMult: 0.65, accuracy: 0.60, wpThresh: 22 },
+    hard:   { speedMult: 0.78, accuracy: 0.75, wpThresh: 16 }
 };
 
 const RACE_LAPS = 3;
@@ -1154,7 +1154,7 @@ class AICar extends GameCar {
         const combined = angleDiff + this.steerNoise * (1 - this.diff.accuracy);
         if (combined > 0.05) input.left = true;
         else if (combined < -0.05) input.right = true;
-        if (Math.abs(angleDiff) > 0.5 && this.speed > 50) { input.up = false; input.down = true; }
+        if (Math.abs(angleDiff) > 0.4 && this.speed > 40) { input.up = false; input.down = true; }
 
         // AI nitro usage
         if (Math.abs(angleDiff) < 0.2 && this.speed > 60 && this.nitroCooldownTimer <= 0) input.nitro = true;
@@ -1170,19 +1170,23 @@ class AICar extends GameCar {
 
         this.update(dt, input);
 
-        // Rubber-banding: AI slows down when far ahead, speeds up when behind
+        // Rubber-banding: AI slows down when ahead, so player can always catch up
         let rubberBand = 1.0;
         if (playerCars[0]) {
             const playerProgress = playerCars[0].raceProgress;
             const aiProgress = this.raceProgress;
             const diff = aiProgress - playerProgress;
-            if (diff > 3) {
-                // AI is far ahead — slow down so player can catch up
-                rubberBand = 0.75 + Math.random() * 0.1;
-            } else if (diff > 1.5) {
-                rubberBand = 0.88;
-            } else if (diff < -3) {
-                // AI is far behind — speed up slightly
+            if (diff > 4) {
+                // AI is way ahead — slow way down
+                rubberBand = 0.5;
+            } else if (diff > 2) {
+                // AI is ahead — slow down a lot
+                rubberBand = 0.65;
+            } else if (diff > 0.8) {
+                // AI slightly ahead — ease off
+                rubberBand = 0.82;
+            } else if (diff < -4) {
+                // AI is way behind — speed up a bit
                 rubberBand = 1.05;
             }
         }
@@ -1395,7 +1399,7 @@ function startRace() {
         playerCars.push(p1);
         allCars.push(p1);
         // 5 family AI drivers
-        const difficulties = ['easy', 'easy', 'medium', 'medium', 'hard'];
+        const difficulties = ['easy', 'easy', 'easy', 'medium', 'medium'];
         const numAI = Math.min(5, sp.length - 1, availColors.length);
         for (let i = 0; i < numAI; i++) {
             const ai = new AICar(sp[i + 1].pos.x, sp[i + 1].pos.z, sp[i + 1].angle, availColors[i], difficulties[i]);
