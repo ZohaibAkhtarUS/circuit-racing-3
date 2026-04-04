@@ -234,11 +234,13 @@ class GameCar {
         const effectiveMax = this.starActive ? baseMax + PHYS.nitroBoost * 1.5 :
                              this.nitroActive ? baseMax + PHYS.nitroBoost :
                              this.lightningSlowed ? baseMax * 0.5 : baseMax;
-        const effectiveAccel = this.nitroActive ? PHYS.accel * 1.5 :
-                               this.lightningSlowed ? PHYS.accel * 0.6 : PHYS.accel;
+        // Kid mode: player gets 40% faster acceleration
+        const kidBoost = (selectedDifficulty === 'kid' && this.playerIndex >= 0) ? 1.4 : 1;
+        const effectiveAccel = (this.nitroActive ? PHYS.accel * 1.5 :
+                               this.lightningSlowed ? PHYS.accel * 0.6 : PHYS.accel) * kidBoost;
 
-        // Auto-gas for kid mode on mobile
-        const autoGas = (selectedDifficulty === 'kid' && isMobile);
+        // Auto-gas for kid mode on mobile AND desktop
+        const autoGas = (selectedDifficulty === 'kid');
         const actualUp = input.up || autoGas;
 
         // Accel/brake
@@ -258,8 +260,8 @@ class GameCar {
             this.speed *= selectedDifficulty === 'kid' ? 0.97 : PHYS.offTrackMult;
         }
 
-        // Auto-steering assist for kid mode
-        if (selectedDifficulty === 'kid' && this.playerIndex >= 0 && track) {
+        // Auto-steering assist for kid and easy mode
+        if ((selectedDifficulty === 'kid' || selectedDifficulty === 'easy') && this.playerIndex >= 0 && track) {
             this.applySteeringAssist(input);
         }
 
@@ -422,9 +424,9 @@ class GameCar {
         while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
         while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
 
-        // Gentle nudge toward track
-        if (!input.left && !input.right && Math.abs(angleDiff) > 0.1) {
-            this.angle += angleDiff * 0.03;
+        // Strong nudge toward track — keeps kid on the road
+        if (Math.abs(angleDiff) > 0.08) {
+            this.angle += angleDiff * 0.12;
         }
     }
 
@@ -524,7 +526,7 @@ class GameCar {
                 const push = 1.5 - dist;
                 newX += (dx / dist) * push;
                 newZ += (dz / dist) * push;
-                if (!this.starActive) this.speed *= PHYS.wallSpeedLoss;
+                if (!this.starActive) this.speed *= (selectedDifficulty === 'kid' ? 0.9 : PHYS.wallSpeedLoss);
                 playCollision();
                 break;
             }

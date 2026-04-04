@@ -33,7 +33,7 @@ const PHYS = {
 };
 
 const AI_DIFF = {
-    kid:    { speedMult: 0.55, accuracy: 0.45, wpThresh: 30 },
+    kid:    { speedMult: 0.35, accuracy: 0.35, wpThresh: 35 },
     easy:   { speedMult: 0.72, accuracy: 0.60, wpThresh: 22 },
     medium: { speedMult: 0.86, accuracy: 0.82, wpThresh: 15 },
     hard:   { speedMult: 0.95, accuracy: 0.93, wpThresh: 11 }

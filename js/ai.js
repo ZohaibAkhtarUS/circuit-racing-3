@@ -85,14 +85,33 @@ class AICar extends GameCar {
             else if (avoidDiff < -0.05) { input.right = true; input.left = false; }
         }
 
-        // Rubber banding for kid mode
+        // Rubber banding for kid mode — very aggressive so kid always has a chance
         if (selectedDifficulty === 'kid') {
             const sorted = [...allCars].sort((a, b) => b.raceProgress - a.raceProgress);
             const playerPos = sorted.findIndex(c => c.playerIndex >= 0);
             const aiPos = sorted.indexOf(this);
-            // If AI is far ahead of player, slow down
-            if (aiPos < playerPos && playerPos > 1) {
-                this.speed *= 0.97;
+            // If AI is ahead of player at all, slow down hard
+            if (aiPos < playerPos) {
+                this.speed *= 0.90;
+            }
+            // AI randomly brakes/hesitates to let the kid catch up
+            if (Math.random() < 0.03) {
+                this.speed *= 0.7;
+            }
+            // No nitro for AI in kid mode
+            input.nitro = false;
+            // No offensive items in kid mode
+            if (this.heldItem === ITEMS.MISSILE || this.heldItem === ITEMS.LIGHTNING || this.heldItem === ITEMS.BANANA || this.heldItem === ITEMS.OIL) {
+                this.heldItem = null;
+            }
+        }
+        // Rubber banding for easy mode too (lighter)
+        if (selectedDifficulty === 'easy') {
+            const sorted = [...allCars].sort((a, b) => b.raceProgress - a.raceProgress);
+            const playerPos = sorted.findIndex(c => c.playerIndex >= 0);
+            const aiPos = sorted.indexOf(this);
+            if (aiPos < playerPos && playerPos > 2) {
+                this.speed *= 0.95;
             }
         }
 

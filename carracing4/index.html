@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Circuit Racing 4</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- MAIN MENU -->
+        <div id="menu-overlay" class="overlay active">
+            <div id="menu-content">
+                <h1 class="game-title">CIRCUIT RACING <span class="title-4">4</span></h1>
+                <p class="subtitle">Mikhail's Edition</p>
+
+                <div id="menu-tabs">
+                    <button class="menu-tab active" data-tab="quick-race">QUICK RACE</button>
+                    <button class="menu-tab" data-tab="career">CAREER</button>
+                    <button class="menu-tab" data-tab="options">OPTIONS</button>
+                </div>
+
+                <!-- QUICK RACE TAB -->
+                <div id="tab-quick-race" class="tab-content active">
+                    <div class="select-section">
+                        <h3>SELECT TRACK</h3>
+                        <div id="track-select" class="select-grid"></div>
+                    </div>
+                    <div class="select-section">
+                        <h3>SELECT CAR</h3>
+                        <div id="car-select" class="select-grid car-grid"></div>
+                    </div>
+                    <div class="select-section row-section">
+                        <div class="select-half">
+                            <h3>DIFFICULTY</h3>
+                            <div id="difficulty-select" class="btn-group">
+                                <button class="sel-btn active" data-val="easy">EASY</button>
+                                <button class="sel-btn" data-val="medium">MEDIUM</button>
+                                <button class="sel-btn" data-val="hard">HARD</button>
+                            </div>
+                        </div>
+                        <div class="select-half">
+                            <h3>MODE</h3>
+                            <div id="mode-select" class="btn-group">
+                                <button class="sel-btn active" data-val="vs_bots">VS BOTS</button>
+                                <button class="sel-btn" data-val="2p_coop">2P CO-OP</button>
+                                <button class="sel-btn" data-val="2p_vs">2P VS</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="select-section">
+                        <h3>LAPS</h3>
+                        <div id="laps-select" class="btn-group">
+                            <button class="sel-btn active" data-val="2">2</button>
+                            <button class="sel-btn" data-val="3">3</button>
+                            <button class="sel-btn" data-val="5">5</button>
+                        </div>
+                    </div>
+                    <button id="btn-start-race" class="big-btn">START RACE</button>
+                </div>
+
+                <!-- CAREER TAB -->
+                <div id="tab-career" class="tab-content">
+                    <div id="career-map"></div>
+                    <div id="career-stats">
+                        <span id="career-coins">0</span> Coins |
+                        <span id="career-wins">0</span> Wins |
+                        <span id="career-trophies-count">0</span> Trophies
+                    </div>
+                    <button id="btn-career-race" class="big-btn" disabled>SELECT A TRACK</button>
+                </div>
+
+                <!-- OPTIONS TAB -->
+                <div id="tab-options" class="tab-content">
+                    <div class="option-row">
+                        <label>Graphics</label>
+                        <div id="gfx-select" class="btn-group">
+                            <button class="sel-btn" data-val="low">LOW</button>
+                            <button class="sel-btn active" data-val="medium">MEDIUM</button>
+                            <button class="sel-btn" data-val="high">HIGH</button>
+                            <button class="sel-btn" data-val="ultra">ULTRA</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <label>Sound</label>
+                        <div id="sound-toggle" class="btn-group">
+                            <button class="sel-btn active" data-val="on">ON</button>
+                            <button class="sel-btn" data-val="off">OFF</button>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <label>Camera Shake</label>
+                        <div id="shake-toggle" class="btn-group">
+                            <button class="sel-btn active" data-val="on">ON</button>
+                            <button class="sel-btn" data-val="off">OFF</button>
+                        </div>
+                    </div>
+                    <div class="controls-info">
+                        <h3>CONTROLS</h3>
+                        <div class="control-row"><span>W / Up</span><span>Accelerate</span></div>
+                        <div class="control-row"><span>S / Down</span><span>Brake</span></div>
+                        <div class="control-row"><span>A / D</span><span>Steer</span></div>
+                        <div class="control-row"><span>Space</span><span>Drift</span></div>
+                        <div class="control-row"><span>E</span><span>Nitro</span></div>
+                        <div class="control-row"><span>Q</span><span>Use Item</span></div>
+                        <div class="control-row"><span>C</span><span>Camera</span></div>
+                        <div class="control-row"><span>H</span><span>Horn</span></div>
+                    </div>
+                    <button id="btn-tutorial" class="big-btn secondary">PLAY TUTORIAL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud" class="hidden">
+            <div id="hud-speed">
+                <div id="speed-bar-bg"><div id="speed-bar"></div></div>
+                <span id="speed-num">0</span>
+                <span id="speed-unit">KPH</span>
+            </div>
+            <div id="hud-position"><span id="pos-num">1</span><span id="pos-suffix">ST</span></div>
+            <div id="hud-lap"><span id="lap-current">1</span>/<span id="lap-total">3</span></div>
+            <div id="hud-laptime"></div>
+            <div id="hud-nitro">
+                <div id="nitro-bar-bg"><div id="nitro-bar"></div></div>
+                <span id="nitro-label">NITRO</span>
+            </div>
+            <div id="hud-item"><span id="item-icon"></span><span id="item-name"></span></div>
+            <div id="hud-slipstream" class="hidden">
+                <div id="slip-bar-bg"><div id="slip-bar"></div></div>
+                <span id="slip-label">DRAFTING</span>
+            </div>
+            <canvas id="minimap" width="160" height="160"></canvas>
+            <div id="hud-wrong-way" class="hidden">WRONG WAY!</div>
+            <div id="hud-popup"></div>
+            <div id="hud-combo"></div>
+            <div id="hud-pos-change"></div>
+        </div>
+
+        <!-- COUNTDOWN -->
+        <div id="countdown-overlay" class="overlay hidden">
+            <div id="countdown-num">3</div>
+            <div id="turbo-start-hint" class="hidden">Press GAS at GO!</div>
+        </div>
+
+        <!-- TUTORIAL -->
+        <div id="tutorial-overlay" class="overlay hidden">
+            <div id="tutorial-box">
+                <div id="tutorial-title"></div>
+                <div id="tutorial-text"></div>
+                <div id="tutorial-arrow"></div>
+                <div id="tutorial-progress"></div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="result-overlay" class="overlay hidden">
+            <h2 id="result-title">RACE COMPLETE</h2>
+            <div id="result-list"></div>
+            <div id="result-unlock" class="hidden"></div>
+            <div id="result-rewards">
+                <span id="reward-trophy"></span>
+                <span id="reward-coins"></span>
+            </div>
+            <button id="btn-next-race" class="big-btn">NEXT</button>
+            <button id="btn-back-menu" class="big-btn secondary">MENU</button>
+        </div>
+
+        <!-- PAUSE -->
+        <div id="pause-overlay" class="overlay hidden">
+            <h2>PAUSED</h2>
+            <button id="btn-resume" class="big-btn">RESUME</button>
+            <button id="btn-restart" class="big-btn secondary">RESTART</button>
+            <button id="btn-quit" class="big-btn secondary">QUIT</button>
+        </div>
+
+        <!-- MOBILE CONTROLS -->
+        <div id="mobile-controls" class="hidden">
+            <div id="mob-left" class="mob-btn">&#9664;</div>
+            <div id="mob-right" class="mob-btn">&#9654;</div>
+            <div id="mob-brake" class="mob-btn">BRAKE</div>
+            <div id="mob-nitro" class="mob-btn mob-circle">N</div>
+            <div id="mob-item" class="mob-btn mob-circle">ITEM</div>
+            <div id="mob-drift" class="mob-btn mob-circle">DRIFT</div>
+        </div>
+
+        <!-- SPEED LINES -->
+        <div id="speed-lines" class="hidden"></div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+
+    <!-- Game Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/car.js"></script>
+    <script src="js/track.js"></script>
+    <script src="js/environment.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/items.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/slipstream.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/hud.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/career.js"></script>
+    <script src="js/celebration.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
