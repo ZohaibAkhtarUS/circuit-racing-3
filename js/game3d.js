@@ -35,9 +35,9 @@ const PHYS = {
 };
 
 const AI_DIFF = {
-    easy:   { speedMult: 0.55, accuracy: 0.45, wpThresh: 28 },
-    medium: { speedMult: 0.65, accuracy: 0.60, wpThresh: 22 },
-    hard:   { speedMult: 0.78, accuracy: 0.75, wpThresh: 16 }
+    easy:   { speedMult: 0.45, accuracy: 0.38, wpThresh: 32 },
+    medium: { speedMult: 0.55, accuracy: 0.50, wpThresh: 26 },
+    hard:   { speedMult: 0.68, accuracy: 0.65, wpThresh: 20 }
 };
 
 const RACE_LAPS = 3;
