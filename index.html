@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Circuit Racing 3</title>
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <title>Circuit Racing 1</title>
+    <link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
     <div id="game-container">
         <!-- Menu -->
         <div id="menu-overlay">
-            <h1>CIRCUIT RACING 3</h1>
-            <div class="subtitle">MIKHAIL'S RACING GAME</div>
+            <h1>CIRCUIT RACING 1</h1>
+            <div class="subtitle">THE ULTIMATE KART RACER</div>
 
             <div class="menu-section-title">SELECT MODE</div>
             <div class="mode-btn selected" data-mode="vs_bots" onclick="selectMode(this)">
                 <div class="mode-name">VS BOTS</div>
-                <div class="mode-desc">Race against 3 AI opponents</div>
+                <div class="mode-desc">Race against 5 AI opponents</div>
             </div>
             <div class="mode-btn" data-mode="race_together" onclick="selectMode(this)">
                 <div class="mode-name">RACE TOGETHER</div>
-                <div class="mode-desc">2 players + 2 AI on same screen</div>
+                <div class="mode-desc">2 players + AI on same screen</div>
             </div>
             <div class="mode-btn" data-mode="vs_friends" onclick="selectMode(this)">
                 <div class="mode-name">VS FRIENDS</div>
-                <div class="mode-desc">2-player split screen + 2 AI</div>
+                <div class="mode-desc">2-player split screen + AI</div>
+            </div>
+
+            <div class="menu-section-title">DIFFICULTY</div>
+            <div class="diff-selection">
+                <div class="diff-option" data-diff="kid" onclick="selectDifficulty(this)">Kid</div>
+                <div class="diff-option selected" data-diff="easy" onclick="selectDifficulty(this)">Easy</div>
+                <div class="diff-option" data-diff="medium" onclick="selectDifficulty(this)">Medium</div>
+                <div class="diff-option" data-diff="hard" onclick="selectDifficulty(this)">Hard</div>
             </div>
 
             <div class="menu-section-title">SELECT TRACK</div>
@@ -32,6 +40,7 @@
                 <div class="track-option selected" data-track="0" onclick="selectTrackOption(this)">Green Valley</div>
                 <div class="track-option" data-track="1" onclick="selectTrackOption(this)">Desert Circuit</div>
                 <div class="track-option" data-track="2" onclick="selectTrackOption(this)">Mountain Pass</div>
+                <div class="track-option" data-track="3" onclick="selectTrackOption(this)">Islamabad GP</div>
             </div>
 
             <div class="menu-section-title">CHOOSE YOUR CAR</div>
@@ -47,12 +56,19 @@
                 <div class="car-option" data-color="galaxy" onclick="selectCar(this)"><div class="car-preview" style="background:#9b59b6"></div><div class="car-name">Galaxy Rider</div></div>
                 <div class="car-option" data-color="ice" onclick="selectCar(this)"><div class="car-preview" style="background:#00d2ff"></div><div class="car-name">Ice Breaker</div></div>
                 <div class="car-option" data-color="tiger" onclick="selectCar(this)"><div class="car-preview" style="background:#ff8c00"></div><div class="car-name">Tiger Claw</div></div>
-                <div class="car-option" data-color="pink" onclick="selectCar(this)"><div class="car-preview" style="background:#ff69b4"></div><div class="car-name">Pink Panther</div></div>
+                <div class="car-option" data-color="bugatti" onclick="selectCar(this)"><div class="car-preview" style="background:#1a1a2e"></div><div class="car-name">Bugatti Chiron SS</div></div>
+            </div>
+
+            <div class="menu-section-title" style="font-size:11px;margin-top:12px">GRAPHICS</div>
+            <div class="gfx-selection">
+                <div class="gfx-option" data-gfx="low" onclick="setGfxQuality('low')">Low</div>
+                <div class="gfx-option selected" data-gfx="medium" onclick="setGfxQuality('medium')">Medium</div>
+                <div class="gfx-option" data-gfx="high" onclick="setGfxQuality('high')">High</div>
             </div>
 
             <button id="start-btn" onclick="startRace()">START RACE</button>
             <button id="tutorial-btn" onclick="startRaceWithTutorial()" style="margin-top:8px;padding:8px 30px;font-size:13px;font-family:Arial,sans-serif;color:#aaa;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;">How to Play</button>
-            <div class="controls-help" id="controls-help">WASD/Arrows: Drive | Space/Shift: Drift | E: Nitro | F: Use Item | C: Camera</div>
+            <div class="controls-help" id="controls-help">WASD/Arrows: Drive | Space/Shift: Drift | E: Nitro | F: Use Item | H: Horn | C: Camera</div>
         </div>
 
         <!-- HUD -->
@@ -83,21 +99,18 @@
             <div id="camera-info"><kbd>C</kbd> Chase Cam</div>
             <div id="minimap"><canvas id="minimap-canvas" width="160" height="160"></canvas></div>
             <div id="countdown"></div>
-
-            <!-- Speed Lines Overlay -->
-            <canvas id="speed-lines" width="1" height="1"></canvas>
-
-            <!-- Fun Popup Messages -->
-            <div id="fun-popup"></div>
+            <div id="drift-score"></div>
+            <div id="wrong-way">WRONG WAY!</div>
+            <div id="lightning-flash"></div>
 
             <!-- Mobile Touch Controls -->
             <div id="mobile-controls">
                 <div id="steer-left" class="steer-btn">&#9664;</div>
                 <div id="steer-right" class="steer-btn">&#9654;</div>
                 <div id="brake-btn" class="mobile-action-btn">BRAKE</div>
-                <button class="mobile-action-btn" id="btn-nitro">🚀</button>
-                <button class="mobile-action-btn" id="btn-item">⚡</button>
-                <div id="tilt-indicator">📱 TILT TO STEER</div>
+                <button class="mobile-action-btn" id="btn-nitro">&#x1F680;</button>
+                <button class="mobile-action-btn" id="btn-item">&#x26A1;</button>
+                <div id="tilt-indicator">TILT TO STEER</div>
             </div>
         </div>
 
@@ -118,6 +131,9 @@
         <!-- Results -->
         <div id="result-overlay">
             <h1 id="result-title">RACE COMPLETE</h1>
+            <div id="result-stars" class="result-stars"></div>
+            <div id="new-record" class="new-record" style="display:none">NEW RECORD!</div>
+            <div id="drift-result" class="drift-result"></div>
             <div class="result-table" id="result-table"></div>
             <div class="result-buttons">
                 <button class="result-btn" style="background:#ff6b35" onclick="restartRace()">RACE AGAIN</button>
@@ -127,7 +143,18 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/audio.js?v=7"></script>
-    <script src="js/game3d.js?v=7"></script>
+    <script src="js/config.js?v=9"></script>
+    <script src="js/audio.js?v=9"></script>
+    <script src="js/particles.js?v=9"></script>
+    <script src="js/track.js?v=9"></script>
+    <script src="js/car.js?v=9"></script>
+    <script src="js/ai.js?v=9"></script>
+    <script src="js/items.js?v=9"></script>
+    <script src="js/hud.js?v=9"></script>
+    <script src="js/camera.js?v=9"></script>
+    <script src="js/input.js?v=9"></script>
+    <script src="js/celebration.js?v=9"></script>
+    <script src="js/menu.js?v=9"></script>
+    <script src="js/game.js?v=9"></script>
 </body>
 </html>
