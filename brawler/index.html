@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Mikhail's Brawler</title>
+    <link rel="stylesheet" href="css/brawler.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Rotate Notice (portrait only) -->
+        <div id="rotate-notice">
+            <div class="rotate-icon">📱</div>
+            <div class="rotate-text">Turn your phone sideways!</div>
+        </div>
+
+        <!-- Title Menu -->
+        <div id="menu-overlay" class="overlay">
+            <div class="menu-content">
+                <h1 class="game-title">MIKHAIL'S<br>BRAWLER</h1>
+                <p class="game-subtitle">Beat 'em Up!</p>
+                <button class="menu-btn" id="btn-start">START GAME</button>
+            </div>
+        </div>
+
+        <!-- Character Select -->
+        <div id="char-select-overlay" class="overlay hidden">
+            <h2 class="overlay-title">CHOOSE YOUR HERO</h2>
+            <div id="char-options"></div>
+            <button class="menu-btn" id="btn-char-confirm">FIGHT!</button>
+        </div>
+
+        <!-- Level Select -->
+        <div id="level-select-overlay" class="overlay hidden">
+            <h2 class="overlay-title">SELECT LEVEL</h2>
+            <div id="level-options"></div>
+            <button class="menu-btn small-btn" id="btn-back-menu">BACK</button>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pause-overlay" class="overlay hidden">
+            <h2 class="overlay-title">PAUSED</h2>
+            <button class="menu-btn" id="btn-resume">RESUME</button>
+            <button class="menu-btn" id="btn-restart">RESTART</button>
+            <button class="menu-btn" id="btn-quit">QUIT</button>
+        </div>
+
+        <!-- Result Overlay (Victory / Game Over) -->
+        <div id="result-overlay" class="overlay hidden">
+            <h2 class="overlay-title" id="result-title">VICTORY!</h2>
+            <div id="result-details"></div>
+            <button class="menu-btn" id="btn-next-level">NEXT LEVEL</button>
+            <button class="menu-btn" id="btn-result-menu">MENU</button>
+        </div>
+
+        <!-- Mobile Touch Controls -->
+        <div id="mobile-controls">
+            <div id="joystick-zone">
+                <div id="joystick-base">
+                    <div id="joystick-thumb"></div>
+                </div>
+            </div>
+            <div id="mobile-buttons">
+                <button class="action-btn" id="btn-special">SPECIAL</button>
+                <div id="attack-row">
+                    <button class="action-btn" id="btn-kick">KICK</button>
+                    <button class="action-btn" id="btn-attack">PUNCH</button>
+                </div>
+                <button class="action-btn" id="btn-jump">JUMP</button>
+            </div>
+        </div>
+
+        <!-- Keyboard Controls Hint (desktop only) -->
+        <div id="keyboard-hint">
+            <div class="hint-keys">
+                <span>WASD</span> Move
+                <span>SPACE</span> Punch
+                <span>F</span> Kick
+                <span>SHIFT</span> Jump
+                <span>E</span> Special
+                <span>ESC</span> Pause
+            </div>
+        </div>
+
+        <!-- Pause Button -->
+        <button id="btn-pause">⏸</button>
+    </div>
+    <script src="js/brawler.js"></script>
+</body>
+</html>
