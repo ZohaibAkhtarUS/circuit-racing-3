@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Circuit Racing 4</title>
+    <title>Circuit Racing 4 - Mikhail's Edition</title>
+    <meta name="description" content="Race through Margalla Hills and 5 more tracks! Made for Mikhail.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Racing 4">
+    <meta name="theme-color" content="#5588ff">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -210,5 +217,11 @@
     <script src="js/celebration.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/game.js"></script>
+    <script>
+        // Register Service Worker for offline play & PWA install
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

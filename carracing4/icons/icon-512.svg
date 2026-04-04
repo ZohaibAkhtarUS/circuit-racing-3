@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a1a4e"/><stop offset="1" stop-color="#1a3a8e"/></linearGradient></defs>
+  <rect width="192" height="192" rx="30" fill="url(#bg)"/>
+  <g transform="translate(96,80) rotate(-15)"><ellipse rx="45" ry="22" fill="#cc2233"/><ellipse rx="25" ry="14" cy="-3" fill="rgba(136,187,255,0.4)"/><circle cx="-30" cy="18" r="9" fill="#222"/><circle cx="30" cy="18" r="9" fill="#222"/><circle cx="-30" cy="-18" r="9" fill="#222"/><circle cx="30" cy="-18" r="9" fill="#222"/></g>
+  <text x="96" y="155" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold" font-size="36">CR4</text>
+  <text x="96" y="178" text-anchor="middle" fill="#ffaa44" font-family="sans-serif" font-weight="bold" font-size="14">MIKHAIL'S</text>
+</svg>

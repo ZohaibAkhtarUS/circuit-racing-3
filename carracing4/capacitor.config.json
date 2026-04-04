@@ -1,0 +1,17 @@
+{
+  "appId": "com.mikhail.circuitracing4",
+  "appName": "Circuit Racing 4",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "backgroundColor": "#0a0a1a"
+  },
+  "android": {
+    "backgroundColor": "#0a0a1a",
+    "allowMixedContent": true
+  }
+}
