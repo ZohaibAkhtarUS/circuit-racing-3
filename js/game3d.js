@@ -84,6 +84,20 @@ let clouds = [];
 // Moving obstacles
 let movingObstacles = [];
 
+// Fun effects
+let speedLinesCtx = null;
+let lastPopupTime = 0;
+let popupQueue = [];
+const FUN_MESSAGES = {
+    overtake: ['NICE PASS!', 'ZOOM ZOOM!', 'SEE YA!', 'TOO FAST!', 'WHOOSH!', 'OVERTAKE!'],
+    firstPlace: ['1ST PLACE!', 'LEADING!', 'YOU\'RE #1!', 'CHAMPION!'],
+    nitro: ['NITRO!!!', 'BOOST!', 'SUPER SPEED!', 'TURBO!'],
+    drift: ['DRIFT KING!', 'SIDEWAYS!', 'SKRRT!', 'DRIFT BOOST!'],
+    lastLap: ['FINAL LAP!', 'LAST LAP! GO GO GO!'],
+    itemGet: ['POWER UP!', 'GOT IT!', 'ITEM!'],
+    ramp: ['AIRBORNE!', 'WHEEE!', 'FLYING!']
+};
+
 // --- TOON GRADIENT ---
 function createToonGradient() {
     const colors = new Uint8Array([40, 80, 160, 220]);
@@ -661,8 +675,12 @@ function updateItemBoxes(dt) {
                     ib.active = false;
                     ib.mesh.visible = false;
                     ib.respawnTimer = 5;
-                    // Flash effect
+                    // Flash effect + sound
                     flashItemPickup();
+                    if (car.playerIndex >= 0) {
+                        playItemPickup();
+                        showFunPopup('itemGet', '#ffc800');
+                    }
                 }
             }
         } else {
@@ -880,6 +898,9 @@ class GameCar {
         // Drift
         const wasDrifting = this.isDrifting;
         this.isDrifting = input.drift && Math.abs(this.speed) > 15;
+        if (this.isDrifting && !wasDrifting && this.playerIndex >= 0) {
+            playDriftSound();
+        }
         if (this.isDrifting) {
             this.speed *= PHYS.driftFriction;
             const target = input.left ? 0.35 : input.right ? -0.35 : 0;
@@ -890,6 +911,10 @@ class GameCar {
             if (wasDrifting && this.driftCharge > 0.5) {
                 this.speed += this.driftCharge * 15;
                 for (let i = 0; i < 5; i++) emitParticle(this.x, this.mesh.position.y, this.z, 'boost');
+                if (this.playerIndex >= 0) {
+                    playDriftBoostRelease();
+                    if (this.driftCharge > 1.2) showFunPopup('drift', '#ff6b35');
+                }
             }
             this.driftCharge = 0;
             this.driftAngle *= 0.85;
@@ -899,6 +924,13 @@ class GameCar {
         if (input.nitro && this.nitroCooldownTimer <= 0 && !this.nitroActive) {
             this.nitroActive = true;
             this.nitroTimer = PHYS.nitroDuration;
+            if (this.playerIndex >= 0) {
+                playBoostActivate();
+                showFunPopup('nitro', '#00ddff');
+                if (isMobile && navigator.vibrate) navigator.vibrate([30, 20, 60]);
+                document.getElementById('game-container').classList.add('nitro-flash');
+                setTimeout(function() { document.getElementById('game-container').classList.remove('nitro-flash'); }, 300);
+            }
         }
         if (this.nitroActive) {
             this.nitroTimer -= dt;
@@ -927,6 +959,7 @@ class GameCar {
         if (item === ITEMS.BOOST) {
             this.speed += 40;
             for (let i = 0; i < 8; i++) emitParticle(this.x, this.mesh.position.y, this.z, 'boost');
+            if (this.playerIndex >= 0) playBoostActivate();
         } else if (item === ITEMS.SHIELD) {
             this.shieldActive = true;
             if (!this.shieldMesh) {
@@ -981,6 +1014,10 @@ class GameCar {
                 newX += (dx / dist) * push;
                 newZ += (dz / dist) * push;
                 this.speed *= PHYS.wallSpeedLoss;
+                if (this.playerIndex >= 0 && Math.abs(this.speed) > 20) {
+                    playCollision();
+                    if (isMobile && navigator.vibrate) navigator.vibrate(30);
+                }
                 blocked = true;
                 break;
             }
@@ -1067,7 +1104,17 @@ class GameCar {
         if (dist < cp.radius) {
             this.checkpoint = nextCp;
             if (nextCp === 0) {
-                if (this.lap > 0) { this.lapTimes.push(performance.now() - this.lapStartTime); this.lapStartTime = performance.now(); }
+                if (this.lap > 0) {
+                    this.lapTimes.push(performance.now() - this.lapStartTime);
+                    this.lapStartTime = performance.now();
+                    if (this.playerIndex >= 0) {
+                        playLapComplete();
+                        if (this.lap === RACE_LAPS) {
+                            showFunPopup('lastLap', '#e74c3c');
+                            document.body.classList.add('last-lap-glow');
+                        }
+                    }
+                }
                 this.lap++;
                 if (this.lap === 1) this.lapStartTime = performance.now();
                 if (this.lap > RACE_LAPS) { this.finished = true; this.finishTime = performance.now(); }
@@ -1122,7 +1169,25 @@ class AICar extends GameCar {
         }
 
         this.update(dt, input);
-        this.speed = Math.min(this.speed, PHYS.maxSpeed * this.diff.speedMult * this.speedVar);
+
+        // Rubber-banding: AI slows down when far ahead, speeds up when behind
+        let rubberBand = 1.0;
+        if (playerCars[0]) {
+            const playerProgress = playerCars[0].raceProgress;
+            const aiProgress = this.raceProgress;
+            const diff = aiProgress - playerProgress;
+            if (diff > 3) {
+                // AI is far ahead — slow down so player can catch up
+                rubberBand = 0.75 + Math.random() * 0.1;
+            } else if (diff > 1.5) {
+                rubberBand = 0.88;
+            } else if (diff < -3) {
+                // AI is far behind — speed up slightly
+                rubberBand = 1.05;
+            }
+        }
+
+        this.speed = Math.min(this.speed, PHYS.maxSpeed * this.diff.speedMult * this.speedVar * rubberBand);
 
         if (Math.random() < 0.02) this.steerNoise = (Math.random() - 0.5) * 0.3;
         if (Math.random() < 0.005) this.speedVar = 0.93 + Math.random() * 0.14;
@@ -1200,6 +1265,12 @@ function updateHUD() {
         change.style.animation = 'none';
         void change.offsetHeight;
         change.style.animation = 'posChange 1s ease-out forwards';
+        // Overtake sound & popup
+        if (pos < p.lastPos) {
+            showFunPopup(pos === 1 ? 'firstPlace' : 'overtake', pos === 1 ? '#f1c40f' : '#2ecc71');
+            playLapComplete(); // re-use as overtake ding
+            if (isMobile && navigator.vibrate) navigator.vibrate(40);
+        }
     }
     p.lastPos = pos;
 
@@ -1298,9 +1369,11 @@ function rebuildScene() {
 }
 
 function startRace() {
+    initAudio(); resumeAudio();
     document.getElementById('menu-overlay').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
     document.getElementById('result-overlay').style.display = 'none';
+    document.body.classList.remove('last-lap-glow');
 
     allCars.forEach(c => c.destroy());
     allCars = []; playerCars = []; aiCars = [];
@@ -1369,10 +1442,15 @@ function runCountdown() {
             el.textContent = count;
             el.style.color = count === 3 ? '#fff' : count === 2 ? '#f1c40f' : '#e74c3c';
             el.style.animation = 'none'; void el.offsetHeight; el.style.animation = 'countPop 0.4s ease-out';
+            playCountdownBeep(false);
+            if (isMobile && navigator.vibrate) navigator.vibrate(80);
             count--; setTimeout(tick, 1000);
         } else {
             el.textContent = 'GO MIKHAIL!'; el.style.color = '#2ecc71'; el.style.fontSize = '70px';
             el.style.animation = 'none'; void el.offsetHeight; el.style.animation = 'countPop 0.4s ease-out';
+            playCountdownBeep(true);
+            startEngineSound();
+            if (isMobile && navigator.vibrate) navigator.vibrate([50, 30, 50, 30, 100]);
             gameState = 'racing'; raceStartTime = performance.now();
             allCars.forEach(c => { c.lapStartTime = performance.now(); c.lap = 1; });
             setTimeout(() => { el.style.display = 'none'; }, 500);
@@ -1396,12 +1474,24 @@ function showResults() {
     const overlay = document.getElementById('result-overlay');
     overlay.style.display = 'flex';
     const winnerName = sorted[0].driverName || CAR_COLORS[sorted[0].colorKey].name;
+    stopEngineSound();
+    document.body.classList.remove('last-lap-glow');
     if (isWinner) {
         document.getElementById('result-title').textContent = 'MIKHAIL WINS!!! 🏆';
         document.getElementById('result-title').style.color = '#f1c40f';
+        playVictoryFanfare();
+        // Confetti burst!
+        const p = sorted[0];
+        burstConfetti(p.x, p.mesh.position.y, p.z, 50);
+        if (isMobile && navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
     } else {
         document.getElementById('result-title').textContent = `${winnerName} Wins!`;
         document.getElementById('result-title').style.color = '#ff6b35';
+        // Encouraging message
+        const playerPos = sorted.findIndex(function(c) { return c.playerIndex >= 0; }) + 1;
+        if (playerPos <= 3) {
+            document.getElementById('result-title').textContent = `Almost! You got ${playerPos}${playerPos === 2 ? 'ND' : 'RD'}!`;
+        }
     }
     const table = document.getElementById('result-table');
     table.innerHTML = '';
@@ -1420,15 +1510,95 @@ function showResults() {
 
 function restartRace() { document.getElementById('result-overlay').style.display = 'none'; startRace(); }
 function backToMenu() {
+    stopEngineSound();
     document.getElementById('result-overlay').style.display = 'none';
     document.getElementById('hud').style.display = 'none';
     document.getElementById('menu-overlay').style.display = 'flex';
+    document.body.classList.remove('last-lap-glow');
     gameState = 'menu';
     allCars.forEach(c => c.destroy());
     allCars = []; playerCars = []; aiCars = [];
 }
 
 function formatTime(ms) { const s = ms / 1000; return `${Math.floor(s / 60).toString().padStart(2, '0')}:${Math.floor(s % 60).toString().padStart(2, '0')}.${Math.floor((s * 10) % 10)}`; }
+
+// --- FUN POPUP SYSTEM ---
+function showFunPopup(category, color) {
+    const now = performance.now();
+    if (now - lastPopupTime < 1500) return; // Don't spam
+    lastPopupTime = now;
+    const msgs = FUN_MESSAGES[category];
+    if (!msgs) return;
+    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    const el = document.getElementById('fun-popup');
+    el.textContent = msg;
+    el.style.color = color || '#fff';
+    el.style.display = 'block';
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = 'popupBounce 0.8s ease-out forwards';
+    if (isMobile && navigator.vibrate) navigator.vibrate(50);
+    setTimeout(function() { el.style.display = 'none'; }, 900);
+}
+
+// --- SPEED LINES ---
+function initSpeedLines() {
+    const canvas = document.getElementById('speed-lines');
+    if (!canvas) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    speedLinesCtx = canvas.getContext('2d');
+}
+
+function drawSpeedLines(speed) {
+    const canvas = document.getElementById('speed-lines');
+    if (!speedLinesCtx || !canvas) return;
+    const ratio = Math.abs(speed) / PHYS.maxSpeed;
+
+    if (ratio < 0.5) {
+        canvas.style.opacity = '0';
+        return;
+    }
+
+    canvas.style.opacity = String(Math.min((ratio - 0.5) * 1.5, 0.6));
+    const w = canvas.width, h = canvas.height;
+    const cx = w / 2, cy = h / 2;
+    speedLinesCtx.clearRect(0, 0, w, h);
+
+    const lineCount = Math.floor(ratio * 20);
+    speedLinesCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    speedLinesCtx.lineWidth = 1.5;
+
+    for (let i = 0; i < lineCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const innerR = 80 + Math.random() * 100;
+        const outerR = innerR + 80 + ratio * 200;
+        const x1 = cx + Math.cos(angle) * innerR;
+        const y1 = cy + Math.sin(angle) * innerR;
+        const x2 = cx + Math.cos(angle) * outerR;
+        const y2 = cy + Math.sin(angle) * outerR;
+        speedLinesCtx.beginPath();
+        speedLinesCtx.moveTo(x1, y1);
+        speedLinesCtx.lineTo(x2, y2);
+        speedLinesCtx.stroke();
+    }
+}
+
+// --- CONFETTI BURST ---
+function burstConfetti(x, y, z, count) {
+    for (let i = 0; i < (count || 30); i++) {
+        const px = x + (Math.random() - 0.5) * 8;
+        const pz = z + (Math.random() - 0.5) * 8;
+        const r = Math.random(), g = Math.random(), b = Math.random();
+        if (particleData.length >= MAX_PARTICLES) particleData.shift();
+        particleData.push({
+            x: px, y: y + 2 + Math.random() * 3, z: pz,
+            vx: (Math.random() - 0.5) * 12, vy: 8 + Math.random() * 8, vz: (Math.random() - 0.5) * 12,
+            r: r, g: g, b: b, life: 2.5 + Math.random() * 1.5, maxLife: 3, sz: 0.6,
+            gravity: 6
+        });
+    }
+}
 
 // --- INPUT ---
 function getP1Input() {
@@ -1676,10 +1846,22 @@ function init() {
         }
     });
     window.addEventListener('keyup', e => { keys[e.code] = false; });
-    window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // Resize speed lines canvas
+        const slc = document.getElementById('speed-lines');
+        if (slc) { slc.width = window.innerWidth; slc.height = window.innerHeight; }
+    });
 
+    initSpeedLines();
     animate();
     setupMobileControls();
+
+    // Init audio on first interaction
+    document.addEventListener('click', function() { initAudio(); resumeAudio(); }, { once: true });
+    document.addEventListener('touchstart', function() { initAudio(); resumeAudio(); }, { once: true });
 }
 
 // --- GAME LOOP ---
@@ -1715,6 +1897,17 @@ function animate() {
         updateMovingObstacles(dt);
         updateHUD();
         checkRaceFinish();
+
+        // Engine sound + speed lines
+        if (playerCars[0]) {
+            updateEngineSound(playerCars[0].speed);
+            drawSpeedLines(playerCars[0].speed);
+
+            // Airborne popup
+            if (playerCars[0].isAirborne && playerCars[0].airTime > 0.3 && playerCars[0].airTime < 0.4) {
+                showFunPopup('ramp', '#9b59b6');
+            }
+        }
     }
 
     if (gameState !== 'menu') updateCamera(dt);
