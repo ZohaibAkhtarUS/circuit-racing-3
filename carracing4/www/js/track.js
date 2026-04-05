@@ -3,7 +3,7 @@
 const Track = (() => {
 
     function generateWaypoints(trackDef) {
-        const numPoints = 180;
+        const numPoints = 240;
         const raw = [];
 
         for (let i = 0; i < numPoints; i++) {
@@ -13,78 +13,63 @@ const Track = (() => {
             // All tracks use non-crossing closed loop shapes
             // Base radius varies per track, with small perturbations for interest
             switch (trackDef.id) {
-                case 0: // Sunset Beach - smooth oval with gentle bumps
-                    x = Math.sin(t) * 90 + Math.cos(t * 2) * 12;
-                    z = Math.cos(t) * 65 + Math.sin(t * 2) * 8;
+                case 0: // Margalla Hills - clean oval, always above ground
+                    x = Math.sin(t) * 90;
+                    z = Math.cos(t) * 60;
+                    y = 1 + Math.sin(t * 2) * 1;
+                    break;
+                case 1: // Faisal Circuit
+                    x = Math.sin(t) * 80;
+                    z = Math.cos(t) * 55;
+                    y = 1 + Math.sin(t * 2) * 0.5;
+                    break;
+                case 2: // Snowy Mountains - hills but always above ground
+                    x = Math.sin(t) * 75;
+                    z = Math.cos(t) * 55;
+                    y = 2 + Math.sin(t) * 3 + Math.cos(t * 2) * 1;
+                    break;
+                case 3: // Volcano Rush
+                    x = Math.sin(t) * 70;
+                    z = Math.cos(t) * 60;
+                    y = 1 + Math.sin(t * 2) * 1;
+                    break;
+                case 4: // Cloud Kingdom - big elevated oval
+                    x = Math.sin(t) * 95;
+                    z = Math.cos(t) * 65;
+                    y = 30 + Math.sin(t * 2) * 2;
+                    break;
+                case 5: // Rainbow Road - elevated oval
+                    x = Math.sin(t) * 65;
+                    z = Math.cos(t) * 50;
+                    y = 20 + Math.sin(t * 2) * 3;
+                    break;
+                case 6: // Desert Dunes - wide oval
+                    x = Math.sin(t) * 100;
+                    z = Math.cos(t) * 65;
+                    y = Math.sin(t * 2) * 2;
+                    break;
+                case 7: // Jungle Temple - smaller tighter oval
+                    x = Math.sin(t) * 60;
+                    z = Math.cos(t) * 50;
                     y = Math.sin(t * 2) * 1.5;
                     break;
-                case 1: // Neon City - rectangular-ish circuit with rounded corners
-                    {
-                        const r = 60 + Math.cos(t * 4) * 15;
-                        x = Math.sin(t) * r;
-                        z = Math.cos(t) * (r * 0.7);
-                        y = Math.sin(t * 2) * 2;
-                    }
+                case 8: // Ice Lake - big wide flat oval
+                    x = Math.sin(t) * 95;
+                    z = Math.cos(t) * 70;
+                    y = 0;
                     break;
-                case 2: // Snowy Alps - elongated oval with elevation changes
-                    x = Math.sin(t) * 75 + Math.cos(t * 2) * 10;
-                    z = Math.cos(t) * 50 + Math.sin(t * 2) * 8;
-                    y = Math.sin(t) * 6 + Math.cos(t * 2) * 3;
-                    break;
-                case 3: // Volcanic Island - kidney-shaped loop around volcano
-                    {
-                        const r = 65 + Math.cos(t * 2) * 18;
-                        x = Math.sin(t) * r;
-                        z = Math.cos(t) * (r * 0.8) + Math.sin(t * 2) * 10;
-                        y = Math.sin(t * 2) * 3;
-                    }
-                    break;
-                case 4: // Sky Highway - large smooth oval elevated
-                    x = Math.sin(t) * 95 + Math.cos(t * 2) * 10;
-                    z = Math.cos(t) * 70 + Math.sin(t * 2) * 8;
-                    y = 30 + Math.sin(t * 2) * 3;
-                    break;
-                case 5: // Rainbow Road
-                    {
-                        const r = 55 + Math.cos(t * 2) * 20;
-                        x = Math.sin(t) * r;
-                        z = Math.cos(t) * (r * 0.75);
-                        y = 20 + Math.sin(t * 2) * 4 + Math.cos(t * 3) * 2;
-                    }
-                    break;
-                case 6: // Desert Dunes - wide sweeping oval
-                    x = Math.sin(t) * 100 + Math.cos(t * 2) * 15;
-                    z = Math.cos(t) * 70 + Math.sin(t * 2) * 10;
-                    y = Math.sin(t * 2) * 2 + Math.abs(Math.sin(t * 3)) * 3;
-                    break;
-                case 7: // Jungle Temple - tighter twisty loop
-                    {
-                        const r = 55 + Math.cos(t * 2) * 12;
-                        x = Math.sin(t) * r + Math.cos(t * 2) * 8;
-                        z = Math.cos(t) * (r * 0.85);
-                        y = Math.sin(t * 2) * 2;
-                    }
-                    break;
-                case 8: // Ice Lake - big wide smooth oval
-                    x = Math.sin(t) * 95 + Math.cos(t * 2) * 8;
-                    z = Math.cos(t) * 75 + Math.sin(t * 2) * 6;
-                    y = Math.sin(t * 2) * 1;
-                    break;
-                case 9: // Space Station - elevated loop with gentle curves
-                    {
-                        const r = 65 + Math.cos(t * 2) * 15;
-                        x = Math.sin(t) * r;
-                        z = Math.cos(t) * (r * 0.8);
-                        y = 35 + Math.sin(t * 2) * 3 + Math.cos(t * 3) * 2;
-                    }
+                case 9: // Space Station - elevated oval
+                    x = Math.sin(t) * 70;
+                    z = Math.cos(t) * 55;
+                    y = 35 + Math.sin(t * 2) * 2;
                     break;
             }
             raw.push({ x, y, z });
         }
 
-        // Smooth 8 times for ultra-clean curves (no gaps!)
+        // Smooth 3 times
         let smoothed = raw;
-        for (let pass = 0; pass < 8; pass++) {
+        for (let pass = 0; pass < 3; pass++) {
             const next = [];
             for (let i = 0; i < smoothed.length; i++) {
                 const prev = smoothed[(i - 1 + smoothed.length) % smoothed.length];
@@ -189,7 +174,8 @@ const Track = (() => {
             map: roadTex,
             roughness: trackDef.theme === 'snow' ? 0.4 : 0.7,
             metalness: trackDef.theme === 'neon' ? 0.3 : 0.1,
-            color: trackDef.theme === 'rainbow' ? 0xffffff : 0xffffff
+            color: 0xffffff,
+            side: THREE.DoubleSide
         });
 
         const roadMesh = new THREE.Mesh(roadGeom, roadMat);
@@ -272,7 +258,7 @@ const Track = (() => {
             }
             geom.setAttribute('color', new THREE.BufferAttribute(colorAttr, 3));
 
-            const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6 });
+            const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, side: THREE.DoubleSide });
             const mesh = new THREE.Mesh(geom, mat);
             mesh.receiveShadow = true;
             scene.add(mesh);
@@ -442,7 +428,7 @@ const Track = (() => {
         });
         const ground = new THREE.Mesh(groundGeom, groundMat);
         ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -0.1;
+        ground.position.y = -0.5;
         ground.receiveShadow = true;
         scene.add(ground);
     }
