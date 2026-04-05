@@ -158,7 +158,7 @@ const CAR_COLORS = [
     { id: 'midnight', name: 'Ninja', color: 0x112266, accent: 0x2244aa, unlock: { type: 'trophies', count: 3 } },
     { id: 'chrome', name: 'Robot', color: 0xaabbcc, accent: 0xddddee, unlock: { type: 'trophies', count: 5 } },
     { id: 'neon', name: 'Alien', color: 0x00ff88, accent: 0x00ffcc, unlock: { type: 'winAll' } },
-    { id: 'rainbow', name: 'RAINBOW!', color: 0xff0000, accent: 0x00ff00, unlock: { type: 'goldAll' } }
+    { id: 'bugatti', name: 'BUGATTI', color: 0x0022aa, accent: 0x0044dd, unlock: { type: 'goldAll' }, speedBoost: 570 }
 ];
 
 // AI driver definitions - family members!

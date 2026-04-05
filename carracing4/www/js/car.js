@@ -66,11 +66,12 @@ class GameCar {
 
     createMesh() {
         this.mesh = new THREE.Group();
+        const isBugatti = this.colorDef.id === 'bugatti';
         const bodyMat = new THREE.MeshStandardMaterial({
             color: this.colorDef.color,
-            metalness: 0.7,
-            roughness: 0.25,
-            envMapIntensity: 1.2
+            metalness: isBugatti ? 0.9 : 0.7,
+            roughness: isBugatti ? 0.1 : 0.25,
+            envMapIntensity: isBugatti ? 2.0 : 1.2
         });
         const accentMat = new THREE.MeshStandardMaterial({
             color: this.colorDef.accent,
@@ -92,21 +93,21 @@ class GameCar {
             bodyProfile.push(new THREE.Vector2(widthCurve, z));
         }
 
-        // Lower body - stretched ellipsoid shape
+        // Lower body - stretched ellipsoid shape (Bugatti is wider and lower)
         const lowerGeom = new THREE.SphereGeometry(1, 16, 12);
         const lower = new THREE.Mesh(lowerGeom, bodyMat);
-        lower.scale.set(1.1, 0.4, 2.2);
-        lower.position.set(0, 0.45, 0);
+        lower.scale.set(isBugatti ? 1.3 : 1.1, isBugatti ? 0.3 : 0.4, isBugatti ? 2.6 : 2.2);
+        lower.position.set(0, isBugatti ? 0.35 : 0.45, 0);
         lower.castShadow = true;
         lower.receiveShadow = true;
         this.mesh.add(lower);
         this.bodyMesh = lower;
 
-        // Upper body / hood - slightly flatter ellipsoid on top
+        // Upper body / hood
         const upperGeom = new THREE.SphereGeometry(1, 14, 10);
         const upper = new THREE.Mesh(upperGeom, bodyMat);
-        upper.scale.set(0.95, 0.25, 1.8);
-        upper.position.set(0, 0.75, 0.2);
+        upper.scale.set(isBugatti ? 1.1 : 0.95, isBugatti ? 0.2 : 0.25, isBugatti ? 2.0 : 1.8);
+        upper.position.set(0, isBugatti ? 0.55 : 0.75, 0.2);
         upper.castShadow = true;
         this.mesh.add(upper);
 
@@ -254,7 +255,9 @@ class GameCar {
         if (this.slowTimer > 0) { this.slowTimer -= dt; }
 
         const slowMult = this.slowTimer > 0 ? 0.5 : 1;
-        const maxSpd = (PHYS.maxSpeed + (this.nitroActive ? PHYS.nitroBoost : 0) +
+        // Bugatti has 570 max speed!
+        const baseMaxSpeed = this.colorDef.speedBoost || PHYS.maxSpeed;
+        const maxSpd = (baseMaxSpeed + (this.nitroActive ? PHYS.nitroBoost : 0) +
             (this.slipstreamActive ? PHYS.slipstreamBoost : 0) +
             (this.starActive ? 30 : 0)) * slowMult;
 

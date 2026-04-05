@@ -71,12 +71,21 @@ const Celebration = (() => {
         // Unlocks
         if (result.unlocks && result.unlocks.length > 0) {
             unlockEl.classList.remove('hidden');
-            unlockEl.innerHTML = result.unlocks.map(u =>
-                u.type === 'track' ?
-                    `${u.icon} NEW TRACK: ${u.name} UNLOCKED!` :
-                    `NEW CAR: ${u.name} UNLOCKED!`
-            ).join('<br>');
+            unlockEl.innerHTML = result.unlocks.map(u => {
+                if (u.type === 'track') return `${u.icon} NEW TRACK: ${u.name} UNLOCKED!`;
+                if (u.id === 'bugatti') return '🏎️ BUGATTI UNLOCKED! 570 KPH SUPERCAR! 🏎️';
+                return `NEW CAR: ${u.name} UNLOCKED!`;
+            }).join('<br>');
             Audio.play('unlock', { volume: 0.6 });
+            // Extra celebration for Bugatti
+            if (result.unlocks.some(u => u.id === 'bugatti')) {
+                Audio.play('victory', { volume: 0.7 });
+                spawnFireworks();
+                spawnFireworks();
+                spawnConfetti();
+                spawnConfetti();
+                spawnConfetti();
+            }
         } else {
             unlockEl.classList.add('hidden');
         }
