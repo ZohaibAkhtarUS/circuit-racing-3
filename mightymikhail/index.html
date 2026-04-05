@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Mighty Mikhail</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Rotate Notice (portrait phones) -->
+        <div id="rotate-notice">
+            <div class="rotate-icon">📱</div>
+            <div class="rotate-text">Turn your phone sideways!</div>
+        </div>
+
+        <!-- Title Menu -->
+        <div id="menu-overlay" class="overlay">
+            <div class="menu-content">
+                <h1 class="game-title">MIGHTY<br>MIKHAIL</h1>
+                <p class="game-subtitle">Defender of Islamabad!</p>
+                <button class="menu-btn" id="btn-play">PLAY</button>
+            </div>
+        </div>
+
+        <!-- Level Select -->
+        <div id="level-select-overlay" class="overlay hidden">
+            <h2 class="overlay-title">SELECT LEVEL</h2>
+            <div id="level-options"></div>
+            <button class="menu-btn small-btn" id="btn-back-menu">BACK</button>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pause-overlay" class="overlay hidden">
+            <h2 class="overlay-title">PAUSED</h2>
+            <button class="menu-btn" id="btn-resume">RESUME</button>
+            <button class="menu-btn" id="btn-restart">RESTART</button>
+            <button class="menu-btn red-btn" id="btn-quit">QUIT</button>
+        </div>
+
+        <!-- Result Overlay -->
+        <div id="result-overlay" class="overlay hidden">
+            <h2 class="overlay-title" id="result-title">VICTORY!</h2>
+            <div id="result-details"></div>
+            <button class="menu-btn" id="btn-next-level">NEXT LEVEL</button>
+            <button class="menu-btn small-btn" id="btn-result-menu">MENU</button>
+        </div>
+
+        <!-- Sister Ayzal Cutscene -->
+        <div id="sister-overlay" class="overlay hidden">
+            <h2 class="overlay-title">SISTER AYZAL NEEDS YOU!</h2>
+            <canvas id="sister-canvas" width="400" height="300"></canvas>
+            <div id="sister-buttons" style="display:flex; gap:12px;">
+                <button class="menu-btn small-btn" id="btn-feed">FEED</button>
+                <button class="menu-btn small-btn" id="btn-diaper">DIAPER</button>
+            </div>
+            <button class="menu-btn small-btn hidden" id="btn-sister-done">CONTINUE</button>
+        </div>
+
+        <!-- Mobile Touch Controls -->
+        <div id="mobile-controls">
+            <div id="joystick-zone">
+                <div id="joystick-base">
+                    <div id="joystick-thumb"></div>
+                </div>
+            </div>
+            <div id="mobile-buttons">
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="action-btn" id="btn-ability">POWER</button>
+                    <button class="action-btn" id="btn-cycle">↻</button>
+                </div>
+                <div id="action-row">
+                    <button class="action-btn" id="btn-shoot">SHOOT</button>
+                </div>
+                <button class="action-btn" id="btn-fly">FLY</button>
+            </div>
+        </div>
+
+        <!-- Keyboard Hint -->
+        <div id="keyboard-hint">
+            <div class="hint-keys">
+                <span>WASD</span> Move
+                <span>SPACE</span> Shoot
+                <span>SHIFT</span> Fly
+                <span>E</span> Ability
+                <span>Q</span> Cycle
+                <span>ESC</span> Pause
+            </div>
+        </div>
+
+        <!-- Pause Button -->
+        <button id="btn-pause">⏸</button>
+    </div>
+
+    <!-- Scripts in dependency order -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/abilities.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/hud.js"></script>
+    <script src="js/cutscenes.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
