@@ -268,7 +268,7 @@ function backToMenu() {
 
 // --- TUTORIAL ---
 const TUTORIAL_STEPS = [
-    { title: 'Welcome to Circuit Racing 1!', text: 'Get ready for the most exciting kart race ever! Let\'s learn how to drive!', keys: [], highlight: null },
+    { title: 'Welcome to Circuit Racing 3!', text: 'Get ready for the most exciting kart race ever! Let\'s learn how to drive!', keys: [], highlight: null },
     { title: 'Go Fast!', text: 'Your car accelerates automatically on mobile! On keyboard, hold gas to speed up.', keys: [{ key: 'W / UP', label: 'Gas' }, { key: 'S / DOWN', label: 'Brake' }], highlight: 'speed-panel' },
     { title: 'Steering', text: 'Tilt your phone or tap the arrows to steer. On keyboard, use A/D or arrows.', keys: [{ key: 'A / LEFT', label: 'Left' }, { key: 'D / RIGHT', label: 'Right' }], highlight: null },
     { title: 'Drifting', text: 'Tilt sharply or hold drift while turning for sharp corners. Release for a speed boost!', keys: [{ key: 'SPACE / SHIFT', label: 'Drift' }], highlight: null },
