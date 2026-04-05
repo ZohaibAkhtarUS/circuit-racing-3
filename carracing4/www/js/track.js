@@ -3,7 +3,7 @@
 const Track = (() => {
 
     function generateWaypoints(trackDef) {
-        const numPoints = 120;
+        const numPoints = 180;
         const raw = [];
 
         for (let i = 0; i < numPoints; i++) {
@@ -82,9 +82,9 @@ const Track = (() => {
             raw.push({ x, y, z });
         }
 
-        // Smooth 5 times for extra-clean curves
+        // Smooth 8 times for ultra-clean curves (no gaps!)
         let smoothed = raw;
-        for (let pass = 0; pass < 5; pass++) {
+        for (let pass = 0; pass < 8; pass++) {
             const next = [];
             for (let i = 0; i < smoothed.length; i++) {
                 const prev = smoothed[(i - 1 + smoothed.length) % smoothed.length];
@@ -107,23 +107,28 @@ const Track = (() => {
         const roadWidth = trackDef.roadWidth;
         const halfWidth = roadWidth / 2;
 
-        // Road surface
-        const roadShape = new THREE.Shape();
+        // Road surface - use averaged normals so edges match at curves (no gaps!)
+        // Add 10% extra width to eliminate any micro-gaps at sharp bends
+        const renderHalfWidth = halfWidth * 1.1;
         const roadVertices = [];
-        const roadIndices = [];
 
         for (let i = 0; i < waypoints.length; i++) {
+            const prev = waypoints[(i - 1 + waypoints.length) % waypoints.length];
             const curr = waypoints[i];
             const next = waypoints[(i + 1) % waypoints.length];
-            const dx = next.x - curr.x;
-            const dz = next.z - curr.z;
-            const len = Math.sqrt(dx * dx + dz * dz);
-            const nx = -dz / len;
-            const nz = dx / len;
+
+            // Direction from prev to next (averaged tangent)
+            const tx = next.x - prev.x;
+            const tz = next.z - prev.z;
+            const tLen = Math.sqrt(tx * tx + tz * tz) || 1;
+
+            // Normal is perpendicular to tangent
+            const nx = -tz / tLen;
+            const nz = tx / tLen;
 
             roadVertices.push(
-                curr.x + nx * halfWidth, curr.y + 0.01, curr.z + nz * halfWidth,
-                curr.x - nx * halfWidth, curr.y + 0.01, curr.z - nz * halfWidth
+                curr.x + nx * renderHalfWidth, curr.y + 0.01, curr.z + nz * renderHalfWidth,
+                curr.x - nx * renderHalfWidth, curr.y + 0.01, curr.z - nz * renderHalfWidth
             );
         }
 
@@ -228,13 +233,14 @@ const Track = (() => {
         for (let side = -1; side <= 1; side += 2) {
             const curbVerts = [];
             for (let i = 0; i < waypoints.length; i++) {
+                const prev = waypoints[(i - 1 + waypoints.length) % waypoints.length];
                 const curr = waypoints[i];
                 const next = waypoints[(i + 1) % waypoints.length];
-                const dx = next.x - curr.x;
-                const dz = next.z - curr.z;
-                const len = Math.sqrt(dx * dx + dz * dz);
-                const nx = (-dz / len) * side;
-                const nz = (dx / len) * side;
+                const tx = next.x - prev.x;
+                const tz = next.z - prev.z;
+                const len = Math.sqrt(tx * tx + tz * tz) || 1;
+                const nx = (-tz / len) * side;
+                const nz = (tx / len) * side;
 
                 curbVerts.push(
                     curr.x + nx * halfWidth, (curr.y || 0) + 0.02, curr.z + nz * halfWidth,
@@ -283,13 +289,14 @@ const Track = (() => {
         for (let side = -1; side <= 1; side += 2) {
             const verts = [];
             for (let i = 0; i < waypoints.length; i++) {
+                const prev = waypoints[(i - 1 + waypoints.length) % waypoints.length];
                 const curr = waypoints[i];
                 const next = waypoints[(i + 1) % waypoints.length];
-                const dx = next.x - curr.x;
-                const dz = next.z - curr.z;
-                const len = Math.sqrt(dx * dx + dz * dz);
-                const nx = (-dz / len) * side;
-                const nz = (dx / len) * side;
+                const tx = next.x - prev.x;
+                const tz = next.z - prev.z;
+                const len = Math.sqrt(tx * tx + tz * tz) || 1;
+                const nx = (-tz / len) * side;
+                const nz = (tx / len) * side;
                 const baseY = curr.y || 0;
 
                 verts.push(
