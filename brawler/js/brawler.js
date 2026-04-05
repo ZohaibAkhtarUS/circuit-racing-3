@@ -27,17 +27,17 @@ const COLORS = {
 
 const ENEMY_DEFS = {
     goon: { name: 'Goon', w: 36, h: 60, hp: 40, speed: 80, damage: 8, color: '#ff8844', skin: '#c8a070', attackRange: 45, attackCooldown: 1.2, score: 100 },
-    brute: { name: 'Brute', w: 50, h: 70, hp: 100, speed: 50, damage: 18, color: '#885522', skin: '#b09060', attackRange: 55, attackCooldown: 2.0, score: 250 },
+    brute: { name: 'Brute', w: 50, h: 70, hp: 75, speed: 45, damage: 14, color: '#885522', skin: '#b09060', attackRange: 55, attackCooldown: 2.2, score: 250 },
     ninja: { name: 'Ninja', w: 32, h: 56, hp: 30, speed: 160, damage: 10, color: '#333355', skin: '#d4b08a', attackRange: 40, attackCooldown: 0.8, score: 200 },
-    robot: { name: 'Robot', w: 42, h: 64, hp: 80, speed: 70, damage: 14, color: '#8899aa', skin: '#aabbcc', attackRange: 120, attackCooldown: 1.5, score: 300 },
+    robot: { name: 'Robot', w: 42, h: 64, hp: 55, speed: 60, damage: 10, color: '#8899aa', skin: '#aabbcc', attackRange: 100, attackCooldown: 2.0, score: 300 },
 };
 
 const BOSS_DEFS = [
     { name: 'BIG BULLY', w: 70, h: 90, hp: 250, speed: 60, damage: 22, color: '#cc4400', skin: '#c8a070', attackRange: 65, attackCooldown: 1.8, score: 1000, type: 'bully' },
     { name: 'SHADOW NINJA', w: 40, h: 62, hp: 300, speed: 180, damage: 16, color: '#222244', skin: '#d4b08a', attackRange: 50, attackCooldown: 0.6, score: 1500, type: 'shadow' },
-    { name: 'MECH SUIT', w: 65, h: 85, hp: 400, speed: 55, damage: 25, color: '#667788', skin: '#99aacc', attackRange: 140, attackCooldown: 1.4, score: 2000, type: 'mech' },
-    { name: 'TWIN TERROR', w: 44, h: 66, hp: 180, speed: 100, damage: 15, color: '#884488', skin: '#d0a880', attackRange: 50, attackCooldown: 1.0, score: 1200, type: 'twin' },
-    { name: 'DR. CHAOS', w: 55, h: 78, hp: 500, speed: 90, damage: 20, color: '#aa0000', skin: '#e0c090', attackRange: 60, attackCooldown: 1.2, score: 3000, type: 'chaos' },
+    { name: 'MECH SUIT', w: 65, h: 85, hp: 280, speed: 45, damage: 18, color: '#667788', skin: '#99aacc', attackRange: 110, attackCooldown: 1.8, score: 2000, type: 'mech' },
+    { name: 'TWIN TERROR', w: 44, h: 66, hp: 120, speed: 80, damage: 12, color: '#884488', skin: '#d0a880', attackRange: 50, attackCooldown: 1.3, score: 1200, type: 'twin' },
+    { name: 'DR. CHAOS', w: 55, h: 78, hp: 350, speed: 75, damage: 16, color: '#aa0000', skin: '#e0c090', attackRange: 60, attackCooldown: 1.5, score: 3000, type: 'chaos' },
 ];
 
 const LEVELS = [
@@ -84,12 +84,12 @@ const LEVELS = [
         name: 'Robot Factory', width: 5400, sky: ['#222233','#334455'], ground: '#556677', groundAlt: '#445566',
         bgElements: 'factory',
         waves: [
-            { triggerX: 300, enemies: [{ type: 'robot', count: 2 }] },
-            { triggerX: 900, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 1 }] },
-            { triggerX: 1600, enemies: [{ type: 'brute', count: 2 }, { type: 'robot', count: 1 }] },
-            { triggerX: 2400, enemies: [{ type: 'robot', count: 3 }] },
-            { triggerX: 3400, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 2 }] },
-            { triggerX: 4400, enemies: [{ type: 'robot', count: 3 }, { type: 'brute', count: 1 }] },
+            { triggerX: 300, enemies: [{ type: 'robot', count: 1 }] },
+            { triggerX: 900, enemies: [{ type: 'robot', count: 2 }] },
+            { triggerX: 1600, enemies: [{ type: 'brute', count: 1 }, { type: 'robot', count: 1 }] },
+            { triggerX: 2400, enemies: [{ type: 'robot', count: 2 }] },
+            { triggerX: 3400, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 1 }] },
+            { triggerX: 4400, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 1 }] },
         ],
         boss: 3
     },
@@ -97,12 +97,12 @@ const LEVELS = [
         name: 'Final Fortress', width: 6000, sky: ['#1a0a0a','#3a1a2a'], ground: '#443333', groundAlt: '#332222',
         bgElements: 'fortress',
         waves: [
-            { triggerX: 300, enemies: [{ type: 'goon', count: 2 }, { type: 'ninja', count: 1 }] },
-            { triggerX: 1000, enemies: [{ type: 'brute', count: 1 }, { type: 'robot', count: 2 }] },
-            { triggerX: 1800, enemies: [{ type: 'ninja', count: 2 }, { type: 'robot', count: 1 }] },
-            { triggerX: 2600, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 1 }, { type: 'ninja', count: 1 }] },
-            { triggerX: 3500, enemies: [{ type: 'robot', count: 2 }, { type: 'ninja', count: 2 }] },
-            { triggerX: 4500, enemies: [{ type: 'brute', count: 2 }, { type: 'robot', count: 2 }] },
+            { triggerX: 300, enemies: [{ type: 'goon', count: 2 }] },
+            { triggerX: 1000, enemies: [{ type: 'goon', count: 1 }, { type: 'ninja', count: 1 }] },
+            { triggerX: 1800, enemies: [{ type: 'ninja', count: 2 }] },
+            { triggerX: 2600, enemies: [{ type: 'brute', count: 1 }, { type: 'robot', count: 1 }] },
+            { triggerX: 3500, enemies: [{ type: 'robot', count: 1 }, { type: 'ninja', count: 2 }] },
+            { triggerX: 4500, enemies: [{ type: 'brute', count: 1 }, { type: 'robot', count: 1 }, { type: 'ninja', count: 1 }] },
         ],
         boss: 4
     },
