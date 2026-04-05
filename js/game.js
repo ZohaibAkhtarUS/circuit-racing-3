@@ -53,7 +53,9 @@ function init() {
     // Keyboard
     window.addEventListener('keydown', e => {
         keys[e.code] = true;
-        if (e.code === 'KeyC') {
+        if (e.code === 'Escape') {
+            togglePause();
+        } else if (e.code === 'KeyC') {
             cameraMode = (cameraMode + 1) % cameraNames.length;
             const camInfo = document.getElementById('camera-info');
             if (camInfo) camInfo.innerHTML = `<kbd>C</kbd> ${cameraNames[cameraMode]}`;
@@ -169,6 +171,12 @@ function animate() {
 
     // Clouds drift
     for (const c of clouds) { c.mesh.position.x += c.speed * dt; if (c.mesh.position.x > 200) c.mesh.position.x = -200; }
+
+    if (gamePaused) {
+        if (composer) composer.render();
+        else renderer.render(scene, camera);
+        return;
+    }
 
     if (gameState === 'racing' || gameState === 'finished') {
         if (playerCars[0]) playerCars[0].update(dt, getP1Input());

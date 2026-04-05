@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Circuit Racing 1</title>
-    <link rel="stylesheet" href="css/style.css?v=9">
+    <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
     <div id="game-container">
@@ -98,6 +98,7 @@
                 <div id="item-name"></div>
                 <div id="item-use-hint"><kbd>F</kbd></div>
             </div>
+            <button id="pause-btn" onclick="togglePause()">&#10074;&#10074;</button>
             <div id="camera-info"><kbd>C</kbd> Chase Cam</div>
             <div id="minimap"><canvas id="minimap-canvas" width="160" height="160"></canvas></div>
             <div id="countdown"></div>
@@ -130,6 +131,16 @@
             </div>
         </div>
 
+        <!-- Pause Overlay -->
+        <div id="pause-overlay">
+            <div id="pause-box">
+                <h2 id="pause-title">PAUSED</h2>
+                <button class="pause-menu-btn" onclick="togglePause()">RESUME</button>
+                <button class="pause-menu-btn" onclick="restartRace()">RESTART</button>
+                <button class="pause-menu-btn pause-quit-btn" onclick="quitToMenu()">QUIT</button>
+            </div>
+        </div>
+
         <!-- Results -->
         <div id="result-overlay">
             <h1 id="result-title">RACE COMPLETE</h1>
@@ -145,18 +156,18 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/config.js?v=9"></script>
-    <script src="js/audio.js?v=9"></script>
-    <script src="js/particles.js?v=9"></script>
-    <script src="js/track.js?v=9"></script>
-    <script src="js/car.js?v=9"></script>
-    <script src="js/ai.js?v=9"></script>
-    <script src="js/items.js?v=9"></script>
-    <script src="js/hud.js?v=9"></script>
-    <script src="js/camera.js?v=9"></script>
-    <script src="js/input.js?v=9"></script>
-    <script src="js/celebration.js?v=9"></script>
-    <script src="js/menu.js?v=9"></script>
-    <script src="js/game.js?v=9"></script>
+    <script src="js/config.js?v=10"></script>
+    <script src="js/audio.js?v=10"></script>
+    <script src="js/particles.js?v=10"></script>
+    <script src="js/track.js?v=10"></script>
+    <script src="js/car.js?v=10"></script>
+    <script src="js/ai.js?v=10"></script>
+    <script src="js/items.js?v=10"></script>
+    <script src="js/hud.js?v=10"></script>
+    <script src="js/camera.js?v=10"></script>
+    <script src="js/input.js?v=10"></script>
+    <script src="js/celebration.js?v=10"></script>
+    <script src="js/menu.js?v=10"></script>
+    <script src="js/game.js?v=10"></script>
 </body>
 </html>

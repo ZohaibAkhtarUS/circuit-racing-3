@@ -72,6 +72,7 @@ const GFX_PRESETS = {
 // --- GLOBALS ---
 let scene, camera, renderer, clock, composer;
 let gameState = 'menu';
+let gamePaused = false;
 let gameMode = 'vs_bots';
 let playerColorKey = 'dragon';
 let selectedTrack = 0;

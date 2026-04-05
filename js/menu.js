@@ -234,7 +234,28 @@ function showResults() {
     });
 }
 
-function restartRace() { document.getElementById('result-overlay').style.display = 'none'; startRace(); }
+function togglePause() {
+    if (gameState !== 'racing' && !gamePaused) return;
+    gamePaused = !gamePaused;
+    const overlay = document.getElementById('pause-overlay');
+    if (gamePaused) {
+        overlay.style.display = 'flex';
+        gameState = 'paused';
+        clock.stop();
+    } else {
+        overlay.style.display = 'none';
+        gameState = 'racing';
+        clock.start();
+    }
+}
+
+function quitToMenu() {
+    gamePaused = false;
+    document.getElementById('pause-overlay').style.display = 'none';
+    backToMenu();
+}
+
+function restartRace() { gamePaused = false; document.getElementById('pause-overlay').style.display = 'none'; document.getElementById('result-overlay').style.display = 'none'; startRace(); }
 function backToMenu() {
     document.getElementById('result-overlay').style.display = 'none';
     document.getElementById('hud').style.display = 'none';
