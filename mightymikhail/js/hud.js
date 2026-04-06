@@ -35,7 +35,7 @@ function drawHUD(ctx) {
     const enX = 14, enY = 36;
     drawRR(ctx, enX - 2, enY - 2, 124, 14, 4, 'rgba(0,0,0,0.5)');
     drawRR(ctx, enX, enY, 120, 10, 3, '#222');
-    const enPct = player.energy / ENERGY_MAX;
+    const enPct = player.energy / (player.maxEnergy || ENERGY_MAX);
     if (enPct > 0) {
         drawRR(ctx, enX, enY, 120 * enPct, 10, 3, '#ffcc00');
     }
@@ -45,11 +45,11 @@ function drawHUD(ctx) {
     ctx.fillText('EN', enX + 4, enY + 8);
 
     // --- Booster Fuel Bar (only when flying or fuel < max) ---
-    if (player.flying || player.boosterFuel < BOOSTER_FUEL_MAX) {
+    if (player.flying || player.boosterFuel < (player.maxFuel || BOOSTER_FUEL_MAX)) {
         const bX = 14, bY = 52;
         drawRR(ctx, bX - 2, bY - 2, 104, 12, 4, 'rgba(0,0,0,0.5)');
         drawRR(ctx, bX, bY, 100, 8, 3, '#222');
-        const bPct = player.boosterFuel / BOOSTER_FUEL_MAX;
+        const bPct = player.boosterFuel / (player.maxFuel || BOOSTER_FUEL_MAX);
         if (bPct > 0) {
             drawRR(ctx, bX, bY, 100 * bPct, 8, 3, '#4488ff');
         }

@@ -185,6 +185,7 @@ function setState(newState) {
     document.getElementById('pause-overlay').classList.toggle('hidden', newState !== 'paused');
     document.getElementById('result-overlay').classList.toggle('hidden', newState !== 'victory' && newState !== 'gameover');
     document.getElementById('sister-overlay').classList.toggle('hidden', newState !== 'sister');
+    document.getElementById('shop-overlay').classList.toggle('hidden', newState !== 'shop');
 
     const pauseBtn = document.getElementById('btn-pause');
     pauseBtn.style.display = (newState === 'playing' || newState === 'cutscene_poop') ? 'flex' : 'none';
@@ -202,6 +203,9 @@ function setState(newState) {
     switch (newState) {
         case 'level_select':
             buildLevelSelect();
+            break;
+        case 'shop':
+            Shop.buildShopUI();
             break;
         case 'playing':
             if (prevState === 'cutscene_poop') {
@@ -304,6 +308,17 @@ function setupUI() {
     document.getElementById('btn-back-menu').addEventListener('click', () => {
         playSound('select');
         setState('menu');
+    });
+
+    // Shop
+    document.getElementById('btn-shop').addEventListener('click', () => {
+        playSound('select');
+        setState('shop');
+    });
+
+    document.getElementById('btn-shop-back').addEventListener('click', () => {
+        playSound('select');
+        setState('level_select');
     });
 
     // Pause

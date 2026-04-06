@@ -19,6 +19,10 @@ function createPlayer() {
         boosterFuel: BOOSTER_FUEL_MAX,
         hp: 100, maxHp: 100,
         energy: ENERGY_MAX,
+        maxEnergy: ENERGY_MAX,
+        maxFuel: BOOSTER_FUEL_MAX,
+        baseLaserDamage: 15,
+        baseSpeedMultiplier: 1,
         lives: MAX_LIVES,
         score: 0, coins: 0,
         abilities: ['laser', 'fart'],
@@ -88,7 +92,7 @@ function updatePlayer(dt) {
             }
             break;
         case 'sleep':
-            player.energy = Math.min(ENERGY_MAX, player.energy + ENERGY_REGEN_SLEEP * dt);
+            player.energy = Math.min(player.maxEnergy, player.energy + ENERGY_REGEN_SLEEP * dt);
             if (player.animTimer % 1.0 < 0.05) {
                 emitParticles(player.x + player.w/2, player.y, 'zzz', 1);
             }
@@ -96,8 +100,8 @@ function updatePlayer(dt) {
                 // Respawn
                 player.state = 'idle';
                 player.hp = player.maxHp;
-                player.energy = ENERGY_MAX;
-                player.boosterFuel = BOOSTER_FUEL_MAX;
+                player.energy = player.maxEnergy;
+                player.boosterFuel = player.maxFuel;
                 player.lives--;
                 player.invincible = INVINCIBLE_TIME;
                 player.x = camera.x + 100;
@@ -140,12 +144,12 @@ function updatePlayer(dt) {
 
     // Energy regen (normal)
     if (player.state === 'idle' || player.state === 'walk') {
-        player.energy = Math.min(ENERGY_MAX, player.energy + ENERGY_REGEN * dt);
+        player.energy = Math.min(player.maxEnergy, player.energy + ENERGY_REGEN * dt);
     }
 
     // Booster fuel regen on ground
     if (!player.flying) {
-        player.boosterFuel = Math.min(BOOSTER_FUEL_MAX, player.boosterFuel + BOOSTER_REGEN * dt);
+        player.boosterFuel = Math.min(player.maxFuel, player.boosterFuel + BOOSTER_REGEN * dt);
     }
 
     // Poop timer
@@ -226,7 +230,7 @@ function fireLaser() {
     projectiles.push({
         x: px, y: py, w: 20, h: 4,
         vx: LASER_SPEED * player.facing, vy: 0,
-        damage: 15 * player.damageMultiplier,
+        damage: player.baseLaserDamage * player.damageMultiplier,
         type: 'laser', owner: 'player',
         life: 1.5, color: MIKHAIL.laser,
     });
@@ -264,7 +268,7 @@ function updatePlayerEffects(dt) {
         if (eff.timer <= 0) {
             delete player.activeEffects[key];
             // Reset multipliers
-            if (key === 'speed_boost') player.speedMultiplier = 1;
+            if (key === 'speed_boost') player.speedMultiplier = player.baseSpeedMultiplier;
             if (key === 'super_strength') player.damageMultiplier = 1;
             if (key === 'invisibility') player.visible = true;
         }
@@ -555,7 +559,7 @@ function drawPlayerSleeping(ctx) {
     ctx.stroke();
 
     // Energy bar refilling
-    const energyPct = player.energy / ENERGY_MAX;
+    const energyPct = player.energy / player.maxEnergy;
     ctx.restore();
 
     ctx.save();
@@ -741,6 +745,17 @@ function killEnemy(e) {
     playSound('enemy_die');
     emitParticles(e.x + e.w/2, e.y + e.h/2, 'explosion', 10);
     shakeCamera(3, 0.15);
+
+    // Random food drop
+    if (Math.random() < ENEMY_FOOD_DROP_CHANCE) {
+        const foodIdx = rndInt(0, FOOD_ITEMS.length - 1);
+        const food = FOOD_ITEMS[foodIdx];
+        pickups.push({
+            type: 'food', x: e.x, y: GROUND_Y - 30, w: 18, h: 14,
+            color: food.color, name: food.name,
+            poopDelay: food.poopDelay, energy: food.energy, score: food.score,
+        });
+    }
 }
 
 function drawEnemies(ctx) {
@@ -1381,7 +1396,7 @@ function updatePickups(dt) {
                     emitParticles(pk.x + pk.w/2, pk.y, 'coin_sparkle', 5);
                     break;
                 case 'food':
-                    player.energy = Math.min(ENERGY_MAX, player.energy + pk.energy);
+                    player.energy = Math.min(player.maxEnergy, player.energy + pk.energy);
                     player.score += pk.score;
                     player.poopTimer = pk.poopDelay;
                     playSound('food');

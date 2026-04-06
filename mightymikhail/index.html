@@ -31,7 +31,10 @@
         <div id="level-select-overlay" class="overlay hidden">
             <h2 class="overlay-title">SELECT LEVEL</h2>
             <div id="level-options"></div>
-            <button class="menu-btn small-btn" id="btn-back-menu">BACK</button>
+            <div style="display:flex; gap:12px;">
+                <button class="menu-btn small-btn" id="btn-shop">SHOP</button>
+                <button class="menu-btn small-btn" id="btn-back-menu">BACK</button>
+            </div>
         </div>
 
         <!-- Pause Menu -->
@@ -59,6 +62,23 @@
                 <button class="menu-btn small-btn" id="btn-diaper">DIAPER</button>
             </div>
             <button class="menu-btn small-btn hidden" id="btn-sister-done">CONTINUE</button>
+        </div>
+
+        <!-- Shop -->
+        <div id="shop-overlay" class="overlay hidden">
+            <h2 class="overlay-title">HERO SHOP</h2>
+            <div id="shop-coins" class="shop-coins-display">0 coins</div>
+            <div class="shop-sections">
+                <div class="shop-section">
+                    <h3 class="shop-section-title">Hero Skins</h3>
+                    <div id="shop-skins" class="shop-grid"></div>
+                </div>
+                <div class="shop-section">
+                    <h3 class="shop-section-title">Upgrades</h3>
+                    <div id="shop-upgrades" class="shop-grid"></div>
+                </div>
+            </div>
+            <button class="menu-btn small-btn" id="btn-shop-back">BACK</button>
         </div>
 
         <!-- Mobile Touch Controls -->
@@ -107,6 +127,7 @@
     <script src="js/levels.js"></script>
     <script src="js/hud.js"></script>
     <script src="js/cutscenes.js"></script>
+    <script src="js/shop.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>

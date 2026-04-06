@@ -42,6 +42,10 @@ function startLevel(levelIdx) {
         if (!player.abilities.includes('speed_boost')) player.abilities.push('speed_boost');
     }
 
+    // Apply shop upgrades and skin
+    Shop.applyUpgrades(player);
+    Shop.applyEquippedSkin();
+
     camera.x = 0;
     camera.y = 0;
     camera.shakeTime = 0;
@@ -189,6 +193,9 @@ function completeLevel() {
     progress.scores[currentLevel] = Math.max(progress.scores[currentLevel] || 0, player.score);
     progress.stars[currentLevel] = Math.max(progress.stars[currentLevel] || 0, stars);
     saveProgress(progress);
+
+    // Save coins to shop
+    Shop.addCoins(player.coins);
 
     // Show sister Ayzal scene first, then result
     setTimeout(() => {

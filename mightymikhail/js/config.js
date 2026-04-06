@@ -70,7 +70,7 @@ const LEVELS = [
             { triggerX: 3800, enemies: [{ type: 'small_robot', count: 4 }] },
         ],
         unlockAbility: null, boss: null,
-        foodPickups: [{ x: 1800, type: 0 }],
+        foodPickups: [{ x: 600, type: 1 }, { x: 1200, type: 2 }, { x: 1800, type: 0 }, { x: 2600, type: 1 }, { x: 3400, type: 2 }],
         coinLocations: [600, 1000, 1600, 2200, 2600, 3200, 3600, 4200],
         specialItems: [],
     },
@@ -87,7 +87,7 @@ const LEVELS = [
             { triggerX: 4400, enemies: [{ type: 'ground_alien', count: 3 }] },
         ],
         unlockAbility: 'freeze_ray', boss: null,
-        foodPickups: [{ x: 1500, type: 1 }, { x: 3000, type: 3 }],
+        foodPickups: [{ x: 500, type: 1 }, { x: 1100, type: 2 }, { x: 1500, type: 0 }, { x: 2200, type: 3 }, { x: 3000, type: 1 }, { x: 4000, type: 2 }],
         coinLocations: [400, 800, 1200, 1600, 2000, 2400, 2800, 3200, 3800, 4200],
         specialItems: [{ x: 2200, ability: 'freeze_ray' }],
     },
@@ -104,7 +104,7 @@ const LEVELS = [
             { triggerX: 4400, enemies: [{ type: 'big_robot', count: 3 }] },
         ],
         unlockAbility: 'shield', boss: null,
-        foodPickups: [{ x: 1400, type: 2 }, { x: 3200, type: 0 }],
+        foodPickups: [{ x: 500, type: 2 }, { x: 1100, type: 0 }, { x: 1700, type: 1 }, { x: 2400, type: 3 }, { x: 3200, type: 0 }, { x: 4200, type: 2 }],
         coinLocations: [300, 700, 1100, 1500, 1900, 2300, 2700, 3100, 3500, 4000, 4500],
         specialItems: [{ x: 1600, ability: 'shield' }, { x: 3000, ability: 'sonic_boom' }],
     },
@@ -121,7 +121,7 @@ const LEVELS = [
             { triggerX: 5000, enemies: [{ type: 'big_robot', count: 2 }, { type: 'flying_alien', count: 2 }] },
         ],
         unlockAbility: 'invisibility', boss: null,
-        foodPickups: [{ x: 1800, type: 0 }, { x: 3600, type: 2 }],
+        foodPickups: [{ x: 600, type: 1 }, { x: 1300, type: 0 }, { x: 1800, type: 3 }, { x: 2600, type: 2 }, { x: 3600, type: 0 }, { x: 4400, type: 1 }, { x: 5200, type: 2 }],
         coinLocations: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500],
         specialItems: [{ x: 1400, ability: 'invisibility' }, { x: 3400, ability: 'speed_boost' }],
         windGusts: true,
@@ -139,13 +139,35 @@ const LEVELS = [
             { triggerX: 5500, enemies: [{ type: 'big_robot', count: 3 }, { type: 'flying_alien', count: 2 }] },
         ],
         unlockAbility: 'super_strength', boss: 'alien_mothership',
-        foodPickups: [{ x: 1600, type: 0 }, { x: 3400, type: 1 }, { x: 5000, type: 3 }],
+        foodPickups: [{ x: 600, type: 0 }, { x: 1200, type: 1 }, { x: 1600, type: 3 }, { x: 2400, type: 2 }, { x: 3400, type: 0 }, { x: 4400, type: 1 }, { x: 5000, type: 3 }, { x: 5800, type: 0 }],
         coinLocations: [400, 800, 1200, 1600, 2000, 2400, 2800, 3200, 3600, 4000, 4400, 4800, 5200, 5600, 6000, 6400],
         specialItems: [{ x: 2600, ability: 'super_strength' }],
     },
 ];
 
-// Mikhail drawing colors
+// Shop - Hero Skins
+const SHOP_SKINS = [
+    { id: 'classic', name: 'Classic Hero', cost: 0, suit: '#3366cc', suitLight: '#4488ee', cape: '#cc2222', capeShade: '#991111', boots: '#dd4444', star: '#ffcc00' },
+    { id: 'fire', name: 'Fire Hero', cost: 100, suit: '#cc3322', suitLight: '#ee5544', cape: '#ff8800', capeShade: '#cc6600', boots: '#ff6622', star: '#ffee00' },
+    { id: 'ice', name: 'Ice Hero', cost: 100, suit: '#ddeeff', suitLight: '#eef4ff', cape: '#4488ff', capeShade: '#2266cc', boots: '#6699ff', star: '#aaeeff' },
+    { id: 'shadow', name: 'Shadow Hero', cost: 150, suit: '#222233', suitLight: '#333355', cape: '#6633cc', capeShade: '#4422aa', boots: '#443366', star: '#aa66ff' },
+    { id: 'gold', name: 'Gold Hero', cost: 200, suit: '#ccaa22', suitLight: '#eecc44', cape: '#ffcc00', capeShade: '#cc9900', boots: '#ddaa00', star: '#ffffff' },
+    { id: 'pakistan', name: 'Pakistan Hero', cost: 250, suit: '#006633', suitLight: '#118844', cape: '#ffffff', capeShade: '#cccccc', boots: '#008844', star: '#ffffff' },
+];
+
+// Shop - Stat Upgrades
+const SHOP_UPGRADES = [
+    { id: 'hp', name: 'Max HP+', cost: 50, maxLevel: 4, perLevel: 25, icon: '\u2764', desc: '+25 HP' },
+    { id: 'energy', name: 'Max Energy+', cost: 50, maxLevel: 4, perLevel: 25, icon: '\u26A1', desc: '+25 Energy' },
+    { id: 'laser', name: 'Laser Power+', cost: 75, maxLevel: 3, perLevel: 5, icon: '\u2604', desc: '+5 Damage' },
+    { id: 'speed', name: 'Speed+', cost: 75, maxLevel: 3, perLevel: 0.1, icon: '\u{1F3C3}', desc: '+10% Speed' },
+    { id: 'fuel', name: 'Booster Fuel+', cost: 60, maxLevel: 3, perLevel: 25, icon: '\u{1F680}', desc: '+25 Fuel' },
+];
+
+// Enemy food drop chance
+const ENEMY_FOOD_DROP_CHANCE = 0.2;
+
+// Mikhail drawing colors (updated by skin system)
 const MIKHAIL = {
     skin: '#d4a06a',
     hair: '#222',
