@@ -110,12 +110,12 @@ const LEVELS = [
         name: 'Islamabad Streets', width: 5500, sky: ['#6cacdf','#c8e0f0'], ground: '#707a6a', groundAlt: '#606a5a',
         bgElements: 'islamabad',
         waves: [
-            { triggerX: 300, enemies: [{ type: 'goon', count: 3 }] },
+            { triggerX: 300, enemies: [{ type: 'goon', count: 2 }] },
             { triggerX: 900, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 1 }] },
-            { triggerX: 1600, enemies: [{ type: 'brute', count: 2 }, { type: 'goon', count: 2 }] },
-            { triggerX: 2400, enemies: [{ type: 'goon', count: 3 }, { type: 'brute', count: 2 }] },
-            { triggerX: 3400, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 2 }] },
-            { triggerX: 4500, enemies: [{ type: 'brute', count: 2 }, { type: 'goon', count: 3 }] },
+            { triggerX: 1600, enemies: [{ type: 'brute', count: 1 }, { type: 'goon', count: 2 }] },
+            { triggerX: 2400, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 1 }] },
+            { triggerX: 3400, enemies: [{ type: 'ninja', count: 1 }, { type: 'goon', count: 2 }] },
+            { triggerX: 4500, enemies: [{ type: 'brute', count: 1 }, { type: 'goon', count: 2 }] },
         ],
         boss: 0
     },
@@ -124,12 +124,12 @@ const LEVELS = [
         bgElements: 'castle',
         waves: [
             { triggerX: 300, enemies: [{ type: 'ninja', count: 2 }] },
-            { triggerX: 800, enemies: [{ type: 'ninja', count: 3 }] },
-            { triggerX: 1500, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 2 }] },
-            { triggerX: 2200, enemies: [{ type: 'ninja', count: 3 }, { type: 'brute', count: 1 }] },
-            { triggerX: 3000, enemies: [{ type: 'ninja', count: 4 }] },
-            { triggerX: 3800, enemies: [{ type: 'ninja', count: 3 }, { type: 'robot', count: 1 }] },
-            { triggerX: 4700, enemies: [{ type: 'ninja', count: 4 }, { type: 'brute', count: 1 }] },
+            { triggerX: 800, enemies: [{ type: 'ninja', count: 2 }] },
+            { triggerX: 1500, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 1 }] },
+            { triggerX: 2200, enemies: [{ type: 'ninja', count: 2 }, { type: 'brute', count: 1 }] },
+            { triggerX: 3000, enemies: [{ type: 'ninja', count: 2 }, { type: 'goon', count: 1 }] },
+            { triggerX: 3800, enemies: [{ type: 'ninja', count: 2 }, { type: 'robot', count: 1 }] },
+            { triggerX: 4700, enemies: [{ type: 'ninja', count: 2 }, { type: 'brute', count: 1 }] },
         ],
         boss: 1
     },
@@ -137,14 +137,14 @@ const LEVELS = [
         name: 'Space Arena', width: 6500, sky: ['#050510','#0a0a20'], ground: '#4a4a5a', groundAlt: '#3e3e4e',
         bgElements: 'space',
         waves: [
-            { triggerX: 300, enemies: [{ type: 'robot', count: 2 }, { type: 'goon', count: 1 }] },
-            { triggerX: 900, enemies: [{ type: 'ninja', count: 2 }, { type: 'robot', count: 1 }] },
-            { triggerX: 1600, enemies: [{ type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
-            { triggerX: 2400, enemies: [{ type: 'robot', count: 2 }, { type: 'brute', count: 1 }, { type: 'goon', count: 2 }] },
-            { triggerX: 3200, enemies: [{ type: 'ninja', count: 3 }, { type: 'robot', count: 2 }] },
-            { triggerX: 4000, enemies: [{ type: 'brute', count: 2 }, { type: 'robot', count: 2 }, { type: 'ninja', count: 1 }] },
-            { triggerX: 4800, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
-            { triggerX: 5600, enemies: [{ type: 'robot', count: 3 }, { type: 'brute', count: 2 }, { type: 'ninja', count: 2 }] },
+            { triggerX: 300, enemies: [{ type: 'robot', count: 1 }, { type: 'goon', count: 1 }] },
+            { triggerX: 900, enemies: [{ type: 'ninja', count: 2 }] },
+            { triggerX: 1600, enemies: [{ type: 'brute', count: 1 }, { type: 'ninja', count: 1 }] },
+            { triggerX: 2400, enemies: [{ type: 'robot', count: 1 }, { type: 'goon', count: 2 }] },
+            { triggerX: 3200, enemies: [{ type: 'ninja', count: 2 }, { type: 'robot', count: 1 }] },
+            { triggerX: 4000, enemies: [{ type: 'brute', count: 1 }, { type: 'robot', count: 1 }, { type: 'ninja', count: 1 }] },
+            { triggerX: 4800, enemies: [{ type: 'goon', count: 2 }, { type: 'brute', count: 1 }, { type: 'ninja', count: 1 }] },
+            { triggerX: 5600, enemies: [{ type: 'robot', count: 2 }, { type: 'ninja', count: 1 }] },
         ],
         boss: 4
     },
@@ -237,7 +237,7 @@ let isMobile = false;
 let audioCtx = null;
 let audioInitialized = false;
 let bgElements = [];
-let savedProgress = { unlocked: 1, scores: [0,0,0,0,0], stars: [0,0,0,0,0] };
+let savedProgress = { unlocked: 1, scores: [0,0,0,0,0,0,0,0], stars: [0,0,0,0,0,0,0,0] };
 
 // --- NEW VISUAL GLOBALS ---
 let impactEffects = [];
@@ -2968,13 +2968,13 @@ function showResult(victory) {
         // Save progress
         loadProgress();
         if (selectedLevel + 1 > savedProgress.unlocked - 1) {
-            savedProgress.unlocked = Math.min(5, selectedLevel + 2);
+            savedProgress.unlocked = Math.min(LEVELS.length, selectedLevel + 2);
         }
         savedProgress.scores[selectedLevel] = Math.max(savedProgress.scores[selectedLevel], score);
         savedProgress.stars[selectedLevel] = Math.max(savedProgress.stars[selectedLevel], earnedStars);
         saveProgress();
 
-        nextBtn.style.display = selectedLevel < 4 ? 'block' : 'none';
+        nextBtn.style.display = selectedLevel < LEVELS.length - 1 ? 'block' : 'none';
         nextBtn.textContent = 'NEXT LEVEL';
 
         emitParticles(W/2 + camera.x, H/2, 'confetti', 1);
@@ -2997,7 +2997,12 @@ function showResult(victory) {
 function loadProgress() {
     try {
         const saved = localStorage.getItem('mikhailBrawler');
-        if (saved) savedProgress = JSON.parse(saved);
+        if (saved) {
+            savedProgress = JSON.parse(saved);
+            // Extend arrays if save is from older version with fewer levels
+            while (savedProgress.scores.length < LEVELS.length) savedProgress.scores.push(0);
+            while (savedProgress.stars.length < LEVELS.length) savedProgress.stars.push(0);
+        }
     } catch(e) {}
 }
 
@@ -3217,7 +3222,7 @@ function setupMenus() {
         playSound('select');
         if (gameState === 'gameover') {
             startLevel(selectedLevel);
-        } else if (selectedLevel < 4) {
+        } else if (selectedLevel < LEVELS.length - 1) {
             startLevel(selectedLevel + 1);
         } else {
             setState('menu');
